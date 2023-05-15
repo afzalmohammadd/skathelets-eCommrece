@@ -1,0 +1,207 @@
+
+
+<section class="content-main">
+    <form action="/admin/editProduct/<%= product._id %>" method="post" enctype="multipart/form-data" id="add-product">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">EDIT product</h2>
+                    <div>
+                        <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                        <button type="submit" class="btn btn-md rounded font-sm hover-up">Submit</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Basic</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- <form> -->
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Name</label>
+                                <input type="text" value="<%= product.prodName %>" placeholder="Type here" class="form-control" id="product_name" name="product_name">
+                                <span id="nameError" class="text-danger"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label"> description</label>
+                                <textarea placeholder="Type here" class="form-control" rows="4" name="prodDescription" value="  "<%= product.prodDescription %>"  id="prodDescription"></textarea>
+                                 <span id="descError" class="text-danger"></span>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label">price</label>
+                                        <div class="row gx-2">
+                                            <input placeholder="$" type="number" value="<%= product.prodPrice %>" class="form-control "name="prodPrice" id="prodPrice">
+                                            <span id="priceError" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label">Quantity</label>
+                                        <input placeholder="" type="number" value="<%= product.prodQuantity %>" class="form-control"name="prodQuantity" id="prodQuantity">
+                                        <span id="qtyError" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-lg-4">
+                                    <label class="form-label">Currency</label>
+                                    <select class="form-select">
+                                        <option> USD </option>
+                                        <option> EUR </option>
+                                        <option> RUBL </option>
+                                    </select>
+                                </div> -->
+                            </div>
+                            <!-- <div class="mb-4">
+                                <label class="form-label">Tax rate</label>
+                                <input type="text" placeholder="%" class="form-control" id="product_name">
+                            </div>
+                            <label class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" value="">
+                                <span class="form-check-label"> Make a template </span>
+                            </label> -->
+                        <!-- </form> -->
+                    </div>
+                </div> <!-- card end// -->
+                <div class="card mb-4">
+                    <!-- <div class="card-header">
+                        <h4>Shipping</h4>
+                    </div> -->
+                    <div class="card-body">
+                        <!-- <form> -->
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="mb-4">
+                                        <label for="product_name" class="form-label">Size</label>
+                                        <input type="text" placeholder="inch" value="<%= product.prodSize %>" class="form-control" id="product_size" name="prodSize">
+                                        <span id="sizeError" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-lg-6">
+                                    <div class="mb-4">
+                                        <label for="product_name" class="form-label">Height</label>
+                                        <input type="text" placeholder="inch" class="form-control" id="product_name">
+                                    </div>
+                                </div> -->
+                            </div>
+                            <!-- <div class="mb-4">
+                                <label for="product_name" class="form-label">Weight</label>
+                                <input type="text" placeholder="gam" class="form-control" id="product_name">
+                            </div> -->
+                            <!-- <div class="mb-4">
+                                <label for="product_name" class="form-label">Shipping fees</label>
+                                <input type="text" placeholder="$" class="form-control" id="product_name"name="shippingfees">
+                            </div> -->
+                        <!-- </form> -->
+                    </div>
+                </div> <!-- card end// -->
+            </div>
+
+
+            <div class="col-lg-3">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Media</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-upload">
+                            <img src="/<%=product.prodImage%>" alt="">
+                            <input class="form-control" type="file" name="prodImage" multiple>
+                        </div>
+                    </div>
+                </div> 
+
+                
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4> Categories </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row gx-2">
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" name="Category">
+                                    <% viewCategory.forEach(function(category) { %>
+                                      <option value="<%= category._id %>"><%= category.name %></option>
+                                    <% }) %>
+                                  </select>
+                                  
+                            </div>
+                            
+                        </div> <!-- row.// -->
+                    </div>
+                </div> <!-- card end// -->
+            </div>
+        </div>
+    </form>
+    </section> 
+    
+    <!-- content-main end// -->
+
+    <script>
+  
+        const form = document.querySelector('#add-product')
+    
+        const nameInput = document.getElementById('product_name')
+        const descInput = document.getElementById('prodDescription')
+        const priceInput = document.getElementById('prodPrice')
+        const qtyInput = document.getElementById('prodQuantity')
+        const sizeInput = document.getElementById('product_size')
+    
+    
+        const nameError = document.getElementById('nameError')
+        const descError = document.getElementById('descError')
+        const priceError = document.getElementById('priceError')
+        const qtyError = document.getElementById('qtyError')
+        const sizeError = document.getElementById('sizeError')
+    
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+    
+            let isValid = true;
+    
+            if (nameInput.value.trim() === '') {
+                nameError.innerHTML = 'Please enter the product title';
+                isValid = false;
+            } else {
+                nameError.innerHTML = '';
+            }
+    
+            if (descInput.value.trim() === '') {
+                descError.innerHTML = 'Please enter the product description';
+                isValid = false;
+            } else {
+                descError.innerHTML = '';
+            }
+    
+            if (priceInput.value.trim() === '') {
+                priceError.innerHTML = 'Please enter the product price';
+                isValid = false;
+            } else {
+                priceError.innerHTML = '';
+            }
+    
+            if (qtyInput.value.trim() === '') {
+                qtyError.innerHTML = 'Please enter the product quantity';
+                isValid = false;
+            } else {
+                qtyError.innerHTML = '';
+            }
+    
+            if (sizeInput.value.trim() === '') {
+                sizeError.innerHTML = 'Please enter the product size';
+                isValid = false;
+            } else {
+                sizeError.innerHTML = '';
+            }
+    
+            if (isValid) {
+                form.submit();
+            }
+        });
+    
+    </script>

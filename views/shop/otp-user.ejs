@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Enter Mobile Number</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #f5f5f5;
+		}
+
+		h1 {
+			text-align: center;
+			margin-top: 30px;
+		}
+
+		form {
+			width: 400px;
+			margin: 0 auto;
+			background-color: #fff;
+			padding: 20px;
+			border-radius: 5px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+		}
+
+		label {
+			display: block;
+			margin-bottom: 10px;
+			font-weight: bold;
+			color: #333;
+		}
+
+		input[type="tel"] {
+			display: block;
+			width: 100%;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			font-size: 16px;
+		}
+
+		button[type="submit"] {
+			background-color: #4CAF50;
+			color: #fff;
+			border: none;
+			border-radius: 5px;
+			padding: 10px;
+			font-size: 16px;
+			cursor: pointer;
+			margin-top: 10px;
+			width: 100%;
+		}
+
+		button[type="submit"]:hover {
+			background-color: #3e8e41;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Enter your Mobile Number</h1>
+	<form action="/otp-user" method="post" name="otp-form">
+
+		<label for="mobileNumber">Mobile Number:</label>
+		<input type="tel" id="mobileNumber" name="phone" required minlength="10" maxlength="10" pattern="[0-9]{10}">
+		<button type="submit">Send OTP</button>
+	</form>
+
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	<script>
+		const loginform = document.getElementById("otp-form")
+
+		const mobile = document.getElementById("phone")
+
+		const mobileRegex = /^\d{10}$/;
+
+
+
+		if (mobile.value === "" || mobile.value === null) {
+			e.preventDefault();
+			document.getElementById("mobileNumError").classList.remove('d-none');
+			document.getElementById("mobileNumError").innerHTML = "Phone number must be filled!"
+		} else if (!mobile.value.match(mobileRegex)) {
+			e.preventDefault();
+			document.getElementById("mobileNumError").classList.remove('d-none');
+			document.getElementById("mobileNumError").innerHTML = "Invalid Phone Number";
+		} else if (mobile.value.match(mobileRegex)) {
+			document.getElementById("mobileNumError").classList.remove('d-none');
+			document.getElementById("mobileNumError").innerHTML = ""
+		}
+
+
+	</script>
+
+</body>
+
+</html>

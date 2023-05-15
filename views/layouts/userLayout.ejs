@@ -1,0 +1,13 @@
+<% if (locals.user) { %>
+
+    <%- body %>
+
+<% } else { %>
+
+    <%- include('../partials/userHeader') %>
+
+        <%- body %>
+
+    <%- include('../partials/userFooter') %>
+
+<% } %>

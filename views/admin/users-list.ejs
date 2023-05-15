@@ -1,0 +1,159 @@
+<section class="content-main">
+    <div class="content-header">
+        <h2 class="content-title">Users</h2>
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row gx-3">
+                <div class="col-lg-4 col-md-6 me-auto">
+                    <input type="text" placeholder="Search..." class="form-control">
+                </div>
+                <div class="col-lg-2 col-md-3 col-6">
+                    <select class="form-select">
+                        <option>Status</option>
+                        <option>Active</option>
+                        <option>Disabled</option>
+                        <option>Show all</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-3 col-6">
+                    <select class="form-select">
+                        <option>Show 20</option>
+                        <option>Show 30</option>
+                        <option>Show 40</option>
+                    </select>
+                </div>
+            </div>
+        </header> <!-- card-header end// -->
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>NAME</th>
+                            <th>EMAIL</th>
+                            <th>MOBILE</th>
+                            <th>STATUS</th>
+                            <th class="text-end"> Action </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <% for( let i=0; i < users.length; i++ ) { %>
+                            <tr>
+                                <td width="10%">
+                                    <%= i+1 %>
+                                </td>
+                                <td width="15%">
+                                    <%= users[i].username %>
+                                </td>
+                                <td width="20%">
+                                    <%= users[i].email %>
+                                </td>
+                                <td width="15%">
+                                    <%= users[i].phonenumber %>
+                                </td>
+                                <td>
+                                    <% if (!users[i].blockUser) { %>
+                                        <span id="user-status-<%= users[i]._id %>"
+                                            class="badge rounded-pill alert-success">Active</span>
+                                        <% }else {%>
+                                            <span id="user-status-<%= users[i]._id %>"
+                                                class="badge rounded-pill alert-danger">Blocked</span>
+                                            <% } %>
+                                </td>
+
+                                <td class="text-end" width="20%">
+                                    <% if (!users[i].blockUser) { %>    
+                                        <button id="status-button-<%= users[i]._id %>"
+                                            onclick="blockUser('<%= users[i]._id %>')" type="button"
+                                            class="btn btn-sm btn-success rounded font-sm mt-15 ps-3 pe-3">Block</button>
+
+
+
+                                        <a href="/admin/userProfile/<%= users[i]._id %>"
+                                            class="btn btn-sm btn-brand rounded font-sm mt-15">View Details</a>
+                                        <% } else {%>
+                                            <button id="status-button-<%= users[i]._id %>"
+                                                onclick="unblockUser('<%= users[i]._id %>')" type="button"
+                                                class="btn btn-sm btn-danger rounded font-sm mt-15 ps-3 pe-3">unBlock</button>
+
+                                            <a href="/admin/userProfile/<%= users[i]._id %>"
+                                                class="btn btn-sm btn-brand rounded font-sm mt-15">View Details</a>
+                                            <% } %>
+                                </td>
+                            </tr>
+                            <% } %>
+
+                    </tbody>
+                </table> <!-- table-responsive.// -->
+            </div>
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    <div class="pagination-area mt-15 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                <li class="page-item"><a class="page-link" href="#">02</a></li>
+                <li class="page-item"><a class="page-link" href="#">03</a></li>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="#">16</a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</section> <!-- content-main end// -->
+
+<script>
+
+    function blockUser(userId) {
+        swal('are you sure you want block this user', {
+            title: "Are you sure?",
+            text: 'you are about to block this user',
+            icon: 'warning',
+            buttons: ["Cancel", "Block"]
+        }).then((confirmed) => {
+            if (confirmed) {
+                $.ajax({
+                    url: '/admin/blockUser/' + userId,
+                    type: 'get'
+                }).done(res => {
+                    swal('successsfull', `${res.message}`, 'success').then(() => {
+                        location.reload();
+                    })
+                })
+            } else {
+                swal('Canceleld', 'the user was not blocked', 'info')
+            }
+        })
+            .catch((error) => {
+                swal('Error', `An error occured:${error}`, 'error')
+            })
+    }
+    function unblockUser(userId) {
+        swal('are you sure you want unblock this user', {
+            title: "Are you sure?",
+            text: 'you are about to unblock this user',
+            icon: 'warning',
+            buttons: ["Cancel", "Un-Block"]
+        }).then((confirmed) => {
+            if (confirmed) {
+                $.ajax({
+                    url: '/admin/unblockUser/' + userId,
+                    type: 'get'
+                }).done(res => {
+                    swal('successsfull', `done`, 'success').then(() => {
+                        location.reload();
+                    })
+                })
+            } else {
+                swal('Canceleld', 'the user was not blocked', 'info')
+            }
+        })
+            .catch((error) => {
+                swal('Error', `An error occured:${error}`, 'error')
+            })
+    }
+</script>

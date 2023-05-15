@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Admin Login</title>
+	<style>
+		body {
+			background-color: #f2f2f2;
+			font-family: Arial, sans-serif;
+			font-size: 16px;
+			color: #333;
+			padding: 0;
+			margin: 0;
+		}
+
+		.container {
+			max-width: 500px;
+			margin: 100px auto;
+			padding: 20px;
+			background-color: #fff;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+			border-radius: 5px;
+		}
+
+		h1 {
+			text-align: center;
+			font-weight: normal;
+			margin-top: 0;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 10px;
+		}
+
+		input[type="text"],
+		input[type="password"] {
+			width: 100%;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 3px;
+			margin-bottom: 20px;
+			box-sizing: border-box;
+		}
+
+		input[type="submit"] {
+			background-color: #4CAF50;
+			color: #fff;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 3px;
+			cursor: pointer;
+		}
+
+		input[type="submit"]:hover {
+			background-color: #000000;
+		}
+
+		.error {
+			color: red;
+			font-weight: bold;
+			margin-bottom: 20px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<h1>Admin Login</h1>
+		<form action="/admin/loginpost" method="post" name="adminLogin">
+			<label for="email">Email:</label>
+			<input type="text" id="email" name="email" required>
+
+			<label for="password">Password:</label>
+			<input type="password" id="password" name="password" required>
+
+			<input type="submit" value="Login">
+		</form>
+	</div>
+
+	<script>
+		const adminLogin = document.getElementById("adminLogin")
+
+
+		const email = document.getElementById("email")
+		const password = document.getElementById("password")
+
+
+		const emailRegX = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+		const passRegX = /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{4,}$/;
+
+		adminLogin.addEventListener('submit', (e) => {
+
+			if (email.value === "" || email.value === null) {
+				e.preventDefault();
+				document.getElementById("emailError").classList.remove('d-none');
+				document.getElementById("emailError").innerHTML = "Email must be filled!"
+			} else if (!email.value.match(emailRegX)) {
+				e.preventDefault();
+				document.getElementById("emailError").classList.remove('d-none');
+				document.getElementById("emailError").innerHTML = "Invalid Email Address";
+			} else if (email.value.match(emailRegX)) {
+				document.getElementById("emailError").classList.remove('d-none');
+				document.getElementById("emailError").innerHTML = ""
+			}
+
+
+			if (password.value === "" || password.value === null) {
+				e.preventDefault();
+				document.getElementById("passwordError").classList.remove('d-none');
+				document.getElementById("passwordError").innerHTML = "password must be filled!"
+			} else if (!password.value.match(passRegX)) {
+				e.preventDefault();
+				document.getElementById("passwordError").classList.remove('d-none');
+				document.getElementById("passwordError").innerHTML = "Password must contain at least 6 characters including one uppercase letter,<br> one lowercase letter, one number and one special character.";
+			} else if (password.value.match(passRegX)) {
+				document.getElementById("passwordError").classList.remove('d-none');
+				document.getElementById("passwordError").innerHTML = ""
+			}
+		})
+	</script>
+</body>
+
+</html>

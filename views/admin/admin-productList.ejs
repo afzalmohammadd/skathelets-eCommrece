@@ -1,0 +1,158 @@
+<style>
+    .square-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+    }
+</style>
+
+<section class="content-main">
+
+    
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Products List</h2>
+
+        </div>
+        <div>
+
+            <!-- <a href="#" class="btn btn-light rounded font-md">Export</a>
+            <a href="#" class="btn btn-light rounded  font-md">Import</a> -->
+            <a href="/admin/addproduct" class="btn btn-primary btn-sm rounded">Create new</a>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <!-- <div class="col col-check flex-grow-0">
+                    <div class="form-check ms-2">
+                        <input class="form-check-input" type="checkbox" value="">
+                    </div>
+                </div> -->
+                <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                    <select class="form-select">
+                        <option selected>All category</option>
+                        <option>Electronics</option>
+                        <option>Clothes</option>
+                        <option>Automobile</option>
+                    </select>
+                </div> -->
+                <!-- <div class="col-md-2 col-6">
+                    <input type="date" value="02.05.2021" class="form-control">
+                </div>
+                <div class="col-md-2 col-6">
+                    <select class="form-select">
+                        <option selected>Status</option>
+                        <option>Active</option>
+                        <option>Disabled</option>
+                        <option>Show all</option>
+                    </select>
+                </div> -->
+            </div>
+        </header> <!-- card-header end// -->
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="text-left">
+                            <th style="padding-left: 1.5rem;">Image</th>
+                            <th style="padding-left: 2rem;">Name</th>
+                            <th style="padding-left: 1.5rem;">Category</th>
+                            <th style="padding-left: 1.5rem;">Price</th>
+                            <th style="padding-left: 1.5rem;">Quantity</th>
+                            <th style="padding-left: 1.5rem;">Size</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% result.forEach(function(products) { %>
+                            <tr>
+                                <td class="text-center">
+                                    <div >
+                                        <b>
+
+                                            <% if (products.prodImage && products.prodImage.length > 0) { %>
+                                                <% console.log(products.prodImage); %>
+                                                <img src="/uploads/<%=products.prodImage[0] %>" class="img-sm img-thumbnail square-image" alt="Itvdfem">
+                                            <% } else { %>
+                                                <img src="" alt="Default Image"  class="img-sm img-thumbnail square-image">
+                                            <% } %>
+                                            
+                                            
+                                        </b>
+                                        
+                                        
+                                    </div>
+                                </td>
+                                <td>
+                                    <b><%= products.prodName %></b>
+                                </td>
+                                <td>
+                                    
+                                    <b><% if(products.CatDetails && products.CatDetails.length > 0) { %>
+                                        <b><%= products.CatDetails[0].name %></b>
+                                      <% } else { %>
+                                        No category
+                                      <% } %>
+                                      </b>
+                                </td>
+                                <td>
+                                    <b><%= products.prodPrice %></b>
+                                </td>
+                                <td>
+                                    <b><%= products.prodQuantity %></b>
+                                </td>
+                                <td>
+                                    <b><%= products.prodSize %></b>
+                                </td>
+                                <td class="text-end">
+                                    <a href="/admin/editProduct/<%= products._id %>" class="btn btn-primary rounded mt-15" style="margin-right: 10px;">EDIT</a>
+                                </td>
+
+
+
+
+
+
+
+
+                                <td class="text-end">
+
+
+
+                                    <% if (products.unList) { %>
+                                        <a href="/admin/listProduct/<%= products._id %>" class="btn btn-danger rounded mt-15" style="margin-right: 10px;">LIST</a>
+                                        <% } else {%>
+
+                                    <a href="/admin/unlistProduct/<%= products._id %>" class="btn btn-danger rounded mt-15" style="margin-right: 10px;">UNLIST</a>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                        
+
+                    </tbody>
+                </table> <!-- table-responsive.// -->
+            </div>
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    <!-- <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                <li class="page-item"><a class="page-link" href="#">02</a></li>
+                <li class="page-item"><a class="page-link" href="#">03</a></li>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="#">16</a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+            </ul>
+        </nav>
+    </div> -->
+</section> <!-- content-main end// -->
+
+
+
+<script>
+
+
+</script>

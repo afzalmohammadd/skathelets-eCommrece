@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Change Password</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      width: 400px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #555;
+    }
+
+    p.error {
+      color: red;
+    }
+
+    p.success {
+      color: green;
+    }
+  </style>
+</head>
+<!-- /change-password -->
+
+<body>
+  <h1>Change Password</h1>
+  <form action="/change-password" method="post" name="changingPass" id="changingPass">
+
+    <label for="new-password">New Password:</label>
+    <input type="password" id="new-password" name="newPassword">
+
+    <label for="confirm-password">Confirm Password:</label>
+    <input type="password" id="confirm-password" name="confirmPassword">
+    <span id="passwordError"></span>
+    <input type="submit" name="submit" value="Change Password" n id="submit">
+  </form>
+
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <script>
+
+    const form = document.getElementById("changingPass"); // select the form element
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); // prevent form submission
+
+      const newPwd = document.getElementById("new-password").value;
+      const cnPswd = document.getElementById('confirm-password').value;
+
+      const passError = document.getElementById("passwordError");
+
+      if (newPwd.trim() === "" || cnPswd.trim() === "") { // check if fields are empty
+        passError.innerHTML = "Please fill all the fields";
+        return;
+      }
+
+      if (newPwd !== cnPswd) {
+        passError.innerHTML = "Password does not match";
+        passError.style.color = "red"
+        return;
+      }
+
+      // if all validations pass, submit the form
+      form.submit();
+    });
+
+
+
+
+  </script>
+</body>
+
+</html>

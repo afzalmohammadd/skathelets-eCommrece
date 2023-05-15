@@ -1,0 +1,145 @@
+
+    
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Category Management </h2>
+                    <p>Add, edit or delete a category</p>
+                    <div>
+                        <% if (locals.existing) { %>
+                            <p style="color: red;">can't delete ,using in an existing product</p>
+                            <% } %>
+                    </div>
+                </div>
+                <div>
+                    <input type="text" placeholder="Search Categories" class="form-control bg-white">
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <form action="/admin/createCategory" method="post" id="category">
+                                <div class="mb-4">
+                                    <label for="product_name" class="form-label"  >Name</label>
+                                    <input type="text" placeholder="Type here" name="CategoryName" class="form-control" id="category_name" >
+                                    <span id="nameError" class="text-danger"></span>
+                                </div>
+                                <!-- <div class="mb-4">
+                                    <label for="product_slug" class="form-label">Slug</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_slug" />
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Parent</label>
+                                    <select class="form-select">
+                                        <option>Clothes</option>
+                                        <option>T-Shirts</option>
+                                    </select>
+                                </div> -->
+                                <div class="mb-4">
+                                    <label class="form-label">Description</label>
+                                    <!-- <textarea placeholder="Type here"   id="product_name" class="form-control"></textarea> -->
+                                    <input type="text" placeholder="Type here" name="CategoryDescription" class="form-control" id="Description" >
+                                    <span id="descError" class="text-danger"></span>
+                                
+                                </div>
+                                <div class="d-grid">
+                                  
+                                        <button class="btn btn-primary" type="submit">Create category</button>
+                                   
+                                   
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">
+                                                <!-- <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" />
+                                                </div> -->
+                                            </th>
+                                           
+        
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            
+                
+                                            <th class="text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                       
+                                        <% viewCategory.forEach(function(category) { %>
+                                         <tr>
+                                            
+                                            <td class="text-center">
+                                                <!-- <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" />
+                                                </div> -->
+                                            </td>
+                                    
+                                            <td><b><%= category.name %></b></td>
+                                            <td><b><%= category.description %></b></td>
+
+                                            <td class="text-end">
+                                                <a href="/admin/deleteCategory/<%= category._id %>" class="btn btn-danger rounded mt-15" style="margin-right: 10px;">Delete</a>
+                                               
+                                            </td>
+                                            
+                                
+                                           
+                                        </tr>
+                                     
+                                        <%})%>
+                                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!-- .col// -->
+                    </div> <!-- .row // -->
+                </div> <!-- card body .// -->
+            </div> <!-- card .// -->
+        </section> 
+        
+        <script>
+
+            const form = document.querySelector('#category')
+        
+            const nameInput = document.getElementById('category_name')
+            const descInput = document.getElementById('Description')
+        
+        
+            const nameError = document.getElementById('nameError')
+            const descError = document.getElementById('descError')
+
+        
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+        
+                let isValid = true;
+        
+                if (nameInput.value.trim() === '') {
+                    nameError.innerHTML = 'Please enter the CATEGORY NAME';
+                    isValid = false;
+                } else {
+                    nameError.innerHTML = '';
+                }
+        
+                if (descInput.value.trim() === '') {
+                    descError.innerHTML = 'Please enter the DESCRIPTION';
+                    isValid = false;
+                } else {
+                    descError.innerHTML = '';
+                }
+        
+        
+                if (isValid) {
+                    form.submit();
+                }
+            });
+        
+        </script>
+        

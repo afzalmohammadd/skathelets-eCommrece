@@ -1,0 +1,3 @@
+const USER_COLLECTION ='user'
+
+export {USER_COLLECTION}

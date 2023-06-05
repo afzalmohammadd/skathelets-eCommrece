@@ -2,6 +2,7 @@ const { response } = require('express')
 const userData = require('../models/userModel')
 const catogories = require('../models/categoryModel')
 const products = require('../models/productModel')
+const orders = require('../models/orderModel')
 // const mongoose= require('mongoose');
 
 module.exports = {
@@ -156,8 +157,6 @@ module.exports = {
             )
         }
         return updateProduct  
-    }
-
-
+    },
 
 }

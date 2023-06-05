@@ -8,16 +8,46 @@ const { blockUser } = require('../helpers/adminhelper')
 const products = require("../models/productModel")
 const categories = require("../models/categoryModel")
 const cartDB = require('../models/cartModel')
+const orderDB = require('../models/orderModel')
+const addressDB = require('../models/addressModel')
+const addressHelper = require('../helpers/addressHelper')
+const orderhelper = require('../helpers/orderhelper')
+const ObjectId = require('mongoose').Types.ObjectId
 
+const Razorpay = require('razorpay');
+const { log } = require('console')
 
+var instance = new Razorpay({
+    key_id: 'rzp_test_uqjS5a2hmaYBoQ',
+    key_secret: 'LmAP75P7IfisHinnntdOcN2f',
+});
 
+let Status
 let check
+let loginStatus
+let cartCount
+let loginUser
+let loginOrlogout
 
 module.exports = {
-    home: async (req, res) => {
-        try {
+
+    intro: async (req, res) => {
+        if (req.session.user) {
             res.render('shop/home.ejs', {
                 layout: "layouts/userLayout",
+            })
+        } else {
+            res.render('shop/home.ejs', {
+                layout: "layouts/userLayout",
+            })
+        }
+    },
+    home: async (req, res) => {
+        try {
+            Status = req.session.user
+            res.render('shop/home.ejs', {
+                layout: "layouts/userLayout",
+                Status
             })
         } catch (err) {
             console.error(err)
@@ -83,7 +113,10 @@ module.exports = {
                 if (response.loggedin) {
                     console.log("user succesfully loggedin");
                     req.session.user = response.user
-                    let Status = response.user
+                    console.log("aaaaaaaaaffffffffffffff", req.session.user);
+                    Status = response.user
+                    loginStatus = true
+                    loginUser = req.session.user
                     console.log(req.session.user);
                     console.log(response.user + "klkl");
                     res.render('shop/home', {
@@ -109,6 +142,7 @@ module.exports = {
             console.log("logout succesfull");
             res.render('shop/home', {
                 layout: "layouts/userLayout",
+
             })
         } catch (error) {
             console.log(error)
@@ -267,6 +301,7 @@ module.exports = {
                     loginStatus = req.session.user
                     res.render('shop/home', {
                         layout: "layouts/userLayout",
+                        Status
                     })
                 } else {
                     console.log("invalid otp")
@@ -288,7 +323,8 @@ module.exports = {
                 res.render('shop/shopping', {
                     layout: "layouts/userLayout",
                     viewCategory,
-                    viewPoducts
+                    viewPoducts,
+                    Status
                 })
             } else {
                 res.render('shop/login', {
@@ -300,7 +336,8 @@ module.exports = {
         } catch (error) {
             console.log(error);
             res.render('shop/shopping', {
-                layout: "layouts/userLayout"
+                layout: "layouts/userLayout",
+                Status
             })
         }
 
@@ -313,18 +350,21 @@ module.exports = {
             if (viewproduct) {
                 res.render('shop/detail', {
                     layout: "layouts/userLayout",
-                    viewproduct
+                    viewproduct,
+                    Status
                 })
             } else {
                 res.render('shop/shopping', {
-                    layout: "layouts/userLayout"
+                    layout: "layouts/userLayout",
+                    Status
                 })
 
             }
         } catch (error) {
             console.log(error)
             res.render('shop/shopping', {
-                layout: "layouts/userLayout"
+                layout: "layouts/userLayout",
+                Status
             })
         }
     },
@@ -340,37 +380,341 @@ module.exports = {
             userhelper.addToCart(prodId, userID)
                 .then((response) => {
                     console.log('got the response for adding to  cart');
-                    res.json({ status: true })
+                    res.redirect('/getShoppingCart')
                 })
         } catch (error) {
             console.log(error);
         }
     },
-    getShoppingCart: async (req, res) => {
-        let userId = req.session.user._id;
 
+    cart: async (req, res) => {
+        console.log("in cart");
         try {
-            const cart = await cartDB.findOne({ userId }).populate('products.productId');
+            let user = req.session.user;
+            let cartItems = await userhelper.getAllCartItems(user._id)
+            let cartCount = await userhelper.getCartCount(user._id)
+            let totalandSubTotal = await userhelper.totalSubtotal(user._id, cartItems)
 
-            if (!cart) {
-                console.log('Cart not found');
-                return res.render('shop/cart', {
-                    layout: 'layouts/userLayout',
-                    cart: [] // Pass an empty array if cart is not found
-                });
-            }
 
-            console.log("Cart found:", cart) 
+            console.log("cartItems");
+            console.log(totalandSubTotal);
+            console.log("cartItems");
 
             res.render('shop/cart', {
-                layout: 'layouts/userLayout',
-                cart: cart.products
-            });
+                layout: "layouts/userLayout",
+                loginStatus, cartItems, cartCount, totalAmount: totalandSubTotal, Status
+            })
         } catch (error) {
-            console.error('Error finding cart:', error)
-            
+            console.log(error);
+        }
+    },
+    incDecQuantity: async (req, res) => {
+        try {
+            let obj = {}
+            let user = req.session.user
+            let productId = req.body.productId;
+            let quantity = req.body.quantity;
+
+            // console.log("user",user)
+            // console.log("productId",productId)
+            // console.log("quantity",quantity)
+            obj.quantity = await userhelper.incDecProductQuantity(user._id, productId, quantity)
+
+            let cartItems = await userhelper.getAllCartItems(user._id)
+            obj.totalAmount = await userhelper.totalSubtotal(user._id, cartItems)
+            obj.totalAmount = obj.totalAmount.toLocaleString('en-in', { style: 'currency', currency: 'INR' })
+            // console.log(obj);
+            res.status(202).json({ message: obj })
+            // .catch((error)=>{
+            //     res.json({error:true,message:"Quantity must be between 1 - 10"})
+            // })
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    removeFromCart: (req, res) => {
+        try {
+            let cartId = req.body.cartId;
+            let productId = req.params.id
+            // console.log("hello");
+            // console.log(productId);
+            // console.log(cartId);
+            // console.log("hello");
+
+            userhelper.removeAnItemFromCart(cartId, productId)
+                .then((response) => {
+                    console.log("sucessfully deleted");
+                    res.status(202).json({ message: "sucessfully item removed" })
+                })
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    checkout: async (req, res) => {
+        try {
+            const user = req.session.user;
+
+            let cartItems = await userhelper.getAllCartItems(user._id);
+
+            let totalAmount = await userhelper.totalSubtotal(user._id, cartItems);
+            totalAmount = totalAmount.toLocaleString('en-in', { style: 'currency', currency: 'INR' })
+            const userAddress = await addressHelper.findAddresses(user._id)
+            console.log("[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]")
+            console.log(userAddress)
+            console.log("[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]")
+
+            console.log("vvvvvvvvvvvvvvvvvvv");
+            console.log(cartItems);
+            // for (let i = 0; i < cartItems.length; i++) {
+            //     if (cartItems[i].product) {
+            //         cartItems[i].product.prodPrice = cartItems[i].product.product_price.toLocaleString('en-in', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+            //       }else{
+            //         console.log("nooooooooooo");
+            //       }
+
+
+            // }
+            // console.log(loginStatus);
+            console.log("AAAAAAAAAAAAAAAAAAAAAA");
+
+            res.render('shop/checkout', { layout: "layouts/userLayout", loginUser, cartCount, user, totalAmount: totalAmount, cartItems, address: userAddress, Status })
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    addAddress: async (req, res) => {
+        try {
+            console.log("trying to add address");
+            console.log("-------------------------------");
+            console.log(req.body);
+            console.log("-------------------------------");
+            addressHelper.addAddress(req.body)
+                .then((response) => {
+                    // console.log(response)
+                    res.status(202).json({ message: "address added successfully" })
+
+                })
+
+        } catch (error) {
+            console.log(error);
+        }
+
+        // res.render('user/mobile')
+    },
+
+    editAddress: async (req, res) => {
+        try {
+            console.log("controller", req.params.id);
+            let address = await addressHelper.getAnAddress(req.params.id);
+            console.log("controller", address);
+            res.json({ address: address })
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    editAddressPost: async (req, res) => {
+        try {
+
+            let addressUpdated = await addressHelper.editAnAddress(req.body);
+            console.log(addressUpdated);
+            res.json({ message: "address updated" })
+
+        } catch (error) {
+            console.log(error);
+        }
+
+    },
+    placeOrder: async (req, res) => {
+        try {
+            let userId = req.body.userId;
+            let cartItems = await userhelper.getAllCartItems(userId);
+
+            if (!cartItems.length) {
+                return res.json({ error: true, message: "Please add items to cart before checkout" });
+            }
+
+            if (req.body.addressSelected === undefined) {
+                return res.json({ error: true, message: "Please Choose Address" });
+            }
+
+            if (req.body.payment === undefined) {
+                return res.json({ error: true, message: "Please Choose Payment Method" });
+            }
+
+            let totalAmount = await userhelper.totalamount(userId);
+
+
+            if (req.body.payment === 'COD') {
+                await orderhelper.orderPlacing(req.body, totalAmount, cartItems);
+                await userhelper.decreaseStock(cartItems);
+                await userhelper.clearCart(userId);
+                const cartCount = await userhelper.getCartCount(userId);
+                res.status(202).json({ message: "Purchase Done", payment: req.body.payment });
+            } else if (req.body.payment === 'onlinePayment') {
+                const orderId = await orderhelper.orderGetting(req.body, totalAmount, cartItems);
+                await userhelper.decreaseStock(cartItems);
+                await userhelper.clearCart(userId);
+                console.log("inside online payment");
+                console.log(orderId);
+                try {
+                    const response = await orderhelper.generateRazorpay(orderId, totalAmount);
+                    console.log("sally");
+                    console.log(response, "555555555555555555555555555555555555555555555555555555555555555555555555555555555");
+                    res.status(200).json({ response, payment: req.body.payment });
+                } catch (error) {
+                    console.log(error);
+                    res.status(500).json({ status: false, error: 'An error occurred' });
+                }
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: true, message: 'An error occurred' });
+        }
+    },
+    orderSuccess: (req, res) => {
+        try {
+            console.log("this is order success function");
+            res.render('shop/order-success', {
+                layout: "layouts/userLayout",
+                loginStatus,
+                Status
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    orders: async (req, res) => {
+        try {
+            const user = req.session.user
+            let userOrderDetails = await orderhelper.getAllOrderDetailsOfAUser(user._id);
+            console.log("userController here ", userOrderDetails)
+
+
+            console.log("orders", userOrderDetails)
+            console.log("order-user   ++++___++")
+            res.render('shop/orders-user', {
+                layout: "layouts/userLayout",
+                loginStatus,
+                userOrderDetails,
+                cartCount,
+                Status
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    orderCancelling: async (req, res) => {
+        console.log("inside usercontroller for cancelling order");
+        try {
+            console.log("hoooo");
+            const orderId = req.params.id
+            console.log(orderId);
+            let userOrderCancelling = await orderhelper.cancelOrder(orderId)
+            res.redirect('/orders')
+            console.log(userOrderCancelling);
+        } catch (error) {
+
+        }
+    },
+    productOrderDetails: async (req, res) => {
+        try {
+            const orderId = req.params.id
+            let orderdetails = await orderhelper.getOrderedUserDetailsAndAddress(orderId); //got user details
+
+            let productDetails = await orderhelper.getOrderedProductsDetails(orderId); //got ordered products details
+
+
+            res.render('shop/order-details-user', {
+                layout: "layouts/userLayout",
+
+                orderdetails, productDetails, loginStatus, Status
+            })
+        } catch (error) {
+
+        }
+    },
+    verifypayment: async (req, res) => {
+
+        try {
+            console.log("inside verifypayment");
+            let details = req.body;
+            console.log(details, "++++++++++++++++++++++"); // Check the received details
+
+            const crypto = require("crypto");
+            let hmac = crypto.createHmac("sha256", "LmAP75P7IfisHinnntdOcN2f");
+            hmac.update(details["payment[razorpay_order_id]"] + "|" + details["payment[razorpay_payment_id]"]);
+            hmac = hmac.digest("hex");
+            let orderResponse = details["order[response][receipt]"];
+            console.log(orderResponse);
+            let orderObjId = new ObjectId(orderResponse);
+
+            console.log(details["payment"]);
+
+            if (hmac === details["payment[razorpay_signature]"]) {
+                let user = req.session.user;
+
+                await userhelper.clearCart(user._id);
+
+                await orderDB.updateOne(
+                    { _id: orderObjId },
+                    {
+                        $set: {
+                            orderStatus: "placed"
+                        }
+                    }
+                );
+
+                console.log("Payment is successful RazorPay");
+                res.json({ status: true });
+            } else {
+                await orderDB.updateOne(
+                    { _id: orderObjId },
+                    {
+                        $set: {
+                            orderStatus: "failed"
+                        }
+                    }
+                );
+
+                // console.log("Payment is failed");
+                res.json({ status: false, errMsg: "" });
+            }
+        } catch (error) {
+            console.log(error, "error");
+            res.status(500).send("Internal server error");
+        }
+    },
+    profile: async (req, res) => {
+        try {
+            console.log("in profile");
+            const user = req.session.user._id
+            const userData = await users.findById(user)
+            const userAddress = await addressHelper.findAddresses(user)
+            console.log(userData,"ddddddddddddssssssssssssssss");
+
+            res.render('shop/UserAccount', {
+                layout: "layouts/userLayout",
+                userData,
+                Status,
+                address: userAddress
+            })
+        } catch (error) {
+            console.error()
+        }
+    },
+    filterByCategory:async(req,res)=>{
+        try{
+            let category=req.body.categoryId
+            console.log("inside FILTER-BY-CATEGORY");
+            console.log(category);
+            const filteredProd = await products.find({ prodCategory: category })
+            console.log("Filtered By Category",filteredProd)
+
+            res.status(200).json({ products: filteredProd })
+        }catch(error){
+            console.log(error);
         }
     }
-
-
+    
+    
 }

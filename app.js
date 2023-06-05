@@ -12,6 +12,9 @@ const connectDB=require("./connections/database")
 const bodyParser = require('body-parser')
 
 const flash = require('connect-flash');
+const Razorpay = require('razorpay')
+
+// const BlockOr = require('./middlewares/blockCheck')
 
 
 
@@ -20,7 +23,7 @@ var adminRouter = require('./routes/adminRouter');
 
 var app = express();
 connectDB();
-
+// app.use(BlockOr())
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 
@@ -41,8 +44,9 @@ app.use(flash())
 
 app.use(session({
   secret:"blackpark",
+  
+  saveUninitialized: true,
   resave:false,
-  saveUninitialized: false,
   cookie:{
       maxAge:6000000
   }
@@ -57,6 +61,12 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use('/', userRouter);
 app.use('/admin', adminRouter);
+
+
+
+
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

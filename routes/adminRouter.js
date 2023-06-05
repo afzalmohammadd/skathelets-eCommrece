@@ -16,6 +16,14 @@ router.post('/loginpost',adminController.loginPost)
 //  GET admin home page
 router.get('/admin-home',adminChecking,adminController.adminHome)
 
+router.get('/ExcelSalesData',adminChecking,adminController.excelSalesdata)
+
+router.get('/SalesData',adminChecking,adminController.Salesdata)
+
+router.post('/salesReportDate',adminChecking,adminController.salesReportDate)
+
+router.get('/chart',adminChecking,adminController.chart)
+
 
 
 // USER MANAGEMENT
@@ -51,6 +59,11 @@ router.get('/unlistProduct/:id',adminChecking,admincontroller.unlistProduct) //U
 
 router.get('/listProduct/:id',adminChecking,admincontroller.listProduct) //Unlisting Product
 
+
+// ORDER DETAILS
+router.get('/orders',adminChecking,adminController.listOrder)//Listing order
+
+router.post('/order-status',adminChecking,adminController.changeProductOrderStatus)
 
 
 

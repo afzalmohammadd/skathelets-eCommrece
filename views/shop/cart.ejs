@@ -1,94 +1,149 @@
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5">
+        <div class="col-lg-8 table-responsive mb-5">
+            <% if (!cartItems.length) { %>
+                <h1>Cart is Empty</h1>
+               <% } else { %>
+            <table class="table table-bordered text-center mb-0">
+                <thead class="bg-secondary text-dark">
+                    <tr>
+                        <th>Products</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody class="align-middle">
+                    <% for( let i=0; i < cartItems.length; i++ ) { %>
+                    <tr>
+                        <td class="align-middle"><img src="/uploads/<%=cartItems[i].product.prodImage[0] %>" alt="" style="width: 50px;"><%= cartItems[i].product.prodName %></td>
+                        <td class="align-middle">₹<%= cartItems[i].product.prodPrice %></td>
+                        <td class="align-middle">
+                            <div class="input-group quantity mx-auto" style="width: 100px;">
+                                <div class="input-group-btn">
+                                    <button onclick="incDecQuantity('<%= cartItems[i].product._id %>','<%= cartItems[i]._id %>',-1,'<%= cartItems[i].product.product_price %>')"  class="btn btn-sm btn-primary btn-minus" >
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                                <span id="incDec<%= cartItems[i].product._id %>"><%= cartItems[i].quantity %></span>
+                                <div class="input-group-btn">
+                                    <button onclick="incDecQuantity('<%= cartItems[i].product._id %>','<%= cartItems[i]._id %>',1,'<%= cartItems[i].product.product_price %>')" class="btn btn-sm btn-primary btn-plus">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                        </td>
+                        <td id="productPrice <%= cartItems[i].product._id %>" class="align-middle">₹<%=cartItems[i].quantity *cartItems[i].product.prodPrice %></td>
 
 
+                        <td class="align-middle">
+                            <button onclick="productRemove('<%= cartItems[i].product._id %>','<%= cartItems[i]._id %>')" class="btn btn-sm btn-primary">
 
-    <!-- Cart Start -->
-    <div class="container-fluid pt-5">
-        <div class="row px-xl-5">
-            <div class="col-lg-8 table-responsive mb-5">
-                <table class="table table-bordered text-center mb-0">
-                    <thead class="bg-secondary text-dark">
-                        <tr>
-                            <th>Products</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
-                            <th>Remove</th>
-                        </tr>
-                    </thead>
-                    <tbody class="align-middle">
-                        <% if (cart && cart.length > 0) { %>
-                            <% cart.forEach(item => { %>
-                                <tr>
-                                    <td class="align-middle">
-                                        <% if (item.productId.prodImage && item.productId.prodImage.length > 0) { %>
-                                            <img src="/uploads/<%= item.productId.prodImage[0] %>" alt="" style="width: 50px;">
-                                        <% } %>
-                                        <%= item.productId.prodName %>
-                                    </td>
-                                    <td class="align-middle"><%= item.productId.prodPrice %></td>
-                                    <td class="align-middle">
-                                        <div class="input-group quantity mx-auto" style="width: 100px;">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-primary btn-minus">
-                                                    <i class="fa fa-minus"></i>
-                                                </button>
-                                            </div>
-                                            <input type="text" class="form-control form-control-sm bg-secondary text-center" value="<%= item.quantity %>">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-primary btn-plus">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="align-middle"><%= item.productId.prodPrice * item.quantity %></td>
-                                    <td class="align-middle">
-                                        <button class="btn btn-sm btn-primary">
-                                            <i class="fa fa-times"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            <% }); %>
-                        <% } %>
-                    </tbody>
-                    
-                </table>
-            </div>
-            <div class="col-lg-4">
-                <form class="mb-5" action="">
-                    <div class="input-group">
-                        <input type="text" class="form-control p-4" placeholder="Coupon Code">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary">Apply Coupon</button>
-                        </div>
-                    </div>
-                </form>
-                <div class="card border-secondary mb-5">
-                    <div class="card-header bg-secondary border-0">
-                        <h4 class="font-weight-semi-bold m-0">Cart Summary</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-3 pt-1">
-                            <h6 class="font-weight-medium">Subtotal</h6>
-                            <h6 class="font-weight-medium">$150</h6>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <h6 class="font-weight-medium">Shipping</h6>
-                            <h6 class="font-weight-medium">$10</h6>
-                        </div>
-                    </div>
-                    <div class="card-footer border-secondary bg-transparent">
-                        <div class="d-flex justify-content-between mt-2">
-                            <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold">$160</h5>
-                        </div>
-                        <button class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button>
+                              <i class="fa fa-times"></i>
+                            </button>
+                          </td>
+                          
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-4">
+            <form class="mb-5" action="">
+                <div class="input-group">
+                    <input type="text" class="form-control p-4" placeholder="Coupon Code">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary">Apply Coupon</button>
                     </div>
                 </div>
+            </form>
+            <div class="card border-secondary mb-5">
+                <div class="card-header bg-secondary border-0">
+                    <h4 class="font-weight-semi-bold m-0">Cart Summary</h4>
+                </div>
+                
+                <div class="card-footer border-secondary bg-transparent">
+                    <div class="d-flex justify-content-between mt-2">
+                        <h5 class="font-weight-bold">Total</h5>
+                        <h5 id="totalAmount" class="font-weight-bold"><%= totalAmount %></h5>
+                    </div>
+                    <a href="/checkout">
+                        <button class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button>
+                      </a>
+                      
+                </div>
             </div>
+            <% } %>
         </div>
     </div>
-    <!-- Cart End -->
+</div>
+<!-- Cart End -->
 
 
-   
+<script>
+    function incDecQuantity(productId, cartId, number, price) {
+        console.log(cartId);
+        console.log(number);
+        console.log(productId);
+        $.ajax({
+            url: '/quantity-change',
+            type: 'post',
+            data: {
+                quantity: number,
+                cartId: cartId,
+                productId: productId
+            }
+        })
+            .done((res) => {
+                if (res) {
+                    console.log(res.message);
+                    // if(!res.error){
+                    document.getElementById('incDec' + productId).innerHTML = res.message.quantity
+                    document.getElementById('totalAmount').innerHTML = res.message.totalAmount
+                    let total = res.message.quantity * price
+                    document.getElementById('productPrice' + productId).innerHTML = total.toLocaleString('en-in', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })
+                    // }
+                    // else{
+                    // swal("Failed", `${err.responseJSON.message}`,"error").then(() => {
+                    //     location.reload();
+                    // })
+                }
+            }
+            )
+    }
+
+
+</script>
+
+<script>
+        function productRemove(productId,cartId) {
+		console.log(cartId);
+		swal("Do you want to remove this item from cart?", {
+			buttons: ["No", "yes"],
+		}).then((res) => {
+			if (res) {
+				$.ajax({
+					url: '/remove-cart-item/' + productId,
+					data:{
+						cartId:cartId
+					},
+					type: 'post',
+				})
+				.done((res) => {
+					swal("Successful",`${res.message}`,"success").then(()=>{
+						location.reload()
+					})
+					
+					console.log(`${res.message}`);
+					
+				})
+				.fail((error) => {
+					console.log(error);
+				})	
+			}
+		})
+
+	}
+</script>

@@ -11,72 +11,130 @@
     <title>Hello, world!</title>
   </head>
   <body>
+    <style>
+        body {
+            background-color: #f2f2f2;
+        }
+    
+        .main {
+            background-color: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+    
+        h2 {
+            font-weight: bold;
+            font-size: 24px;
+            color: #222222;
+            margin-bottom: 20px;
+        }
+    
+        .form-label {
+            color: #222222;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+    
+        .form-control {
+            background-color: #f2f2f2;
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 16px;
+            color: #222222;
+            box-shadow: none;
+            margin-bottom: 15px;
+        }
+    
+        .btn-primary {
+            background-color: #000000;
+            color: #ffffff;
+            font-size: 16px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: bold;
+            border: none;
+        }
+    
+        .btn-primary:hover {
+            background-color: #111111;
+        }
+    
+        .btn-outline-primary {
+            border: 1px solid #000000;
+            background-color: transparent;
+            color: #000000;
+            font-size: 16px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+    
+        .btn-outline-primary:hover {
+            background-color: #000000;
+            color: #ffffff;
+            border-color: #000000;
+        }
+    
+        .text-muted {
+            color: #888888;
+        }
+    
+        a {
+            color: #000000;
+            text-decoration: none;
+        }
+    
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    
     <div role="main" class="main shop py-4">
-
         <div class="container py-4">
-
             <div class="row justify-content-center">
-      
-
                 <div class="col-md-6 col-lg-5">
                     <h2 class="font-weight-bold text-5 mb-0">LOGIN</h2>
                     <form action="/login" id="login-page" method="post" name="login-page">
                         <div>
                             <% if (locals.blockedUser) { %>
-                                <p style="color: red;">User has been blocked.</p>
+                            <p style="color: red;">User has been blocked.</p>
                             <% } %>
-                            
-                            
                         </div>
-                        
-                        <div class="row">
-                            <div class="form-group col">
-                                <label class="form-label text-color-dark text-3">Email <span class="text-color-danger">*</span></label>
-                                <input type="email" name="email" id="email" class="form-control form-control-lg text-4" required>
-                            </div>
+    
+                        <div class="form-group">
+                            <label class="form-label text-color-dark text-3">Email <span class="text-color-danger">*</span></label>
+                            <input type="email" name="email" id="email" class="form-control form-control-lg text-4" required>
                         </div>
-                        
-                        <div class="row">
-                            <div class="form-group col">
-                                <label class="form-label text-color-dark text-3">PASSWORD<span class="text-color-danger">*</span></label>
-                                <input type="password" name="password" id="password"  class="form-control form-control-lg text-4" required>
-                            </div>
+    
+                        <div class="form-group">
+                            <label class="form-label text-color-dark text-3">Password<span class="text-color-danger">*</span></label>
+                            <input type="password" name="password" id="password" class="form-control form-control-lg text-4" required>
                         </div>
-                        <div class="row">
-                            <div class="form-group col">
-                            </div>
+    
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-block rounded-0 text-uppercase font-weight-bold">LOGIN</button>
                         </div>
-                        <div class="row">
-                            <div class="form-group col">
-                                <button type="submit" class="btn btn-dark btn-modern w-100 text-uppercase rounded-0 font-weight-bold text-3 py-3" data-loading-text="Loading...">LOGIN</button>
-                            </div>
+    
+                        <div class="text-center mb-3">
+                            <p class="fw-bold text-muted mb-0">OR</p>
+                            <a href="/otp-user" class="btn btn-outline-primary btn-block" id="specialButton">Login with OTP</a>
                         </div>
-                        <div class="pt-1 mb-3">
-                            <p class="fw-bold mx-3 mb-0 text-muted" style="text-align: center;">OR</p>
-                            <a href="/otp-user" class="btn btn-outline-dark" style="width: 100%;"
-                              id="specialButton">Login with OTP</a>
-                        </div>
-                        <div>
-                            
-                            <ul>
-                                <li><a href="/signup">create an account?</a></li>
-                                  
-                                <li><a href="/forgotpass">forgot password?</a></li>
-
-                                
-                                    
-                                
-                            </ul>
-
+    
+                        <div class="text-center">
+                            <p class="text-muted mb-2">Don't have an account? <a href="/signup">Sign Up</a></p>
+                            <p class="text-muted mb-0">Forgot your password? <a href="/forgotpass">Reset Password</a></p>
                         </div>
                     </form>
-                </div>
-               
+                </div>
             </div>
-
         </div>
-
     </div>
+    
+    
     
 
     <!-- Optional JavaScript; choose one of the two! -->

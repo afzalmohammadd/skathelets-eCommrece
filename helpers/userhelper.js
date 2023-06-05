@@ -4,6 +4,8 @@ const bcrypt=require('bcrypt')
 const { blockUser } = require("./adminhelper")
 const { ObjectId } = require('mongoose').Types
 const cartDB = require('../models/cartModel')
+const products = require('../models/productModel')
+const orderDB = require('../models/orderModel')
 
 module.exports={
     
@@ -65,45 +67,209 @@ module.exports={
 
     // CART MANAGEMENT
     addToCart: (prodId, userId) => {
-        //creating a new doc. in cart collection
-        //with userId and ProdId[]
-        //if the user had a cart then -> push prod ID to prodID[]
-        //if no cart then create a NEW ONE
         return new Promise(async (resolve, reject) => {
-            try {
-                let existingCart = await cartDB.findOne({ userId: new ObjectId(userId) })
-                if (existingCart) {
-                    console.log('exisiting cart');
-                    let exisitingProd = existingCart.products.findIndex(product => product.productId == prodId)
-                    if (exisitingProd !== -1) {
-                        await cartDB.updateOne(
-                            { userId: new ObjectId(userId), 'products.productId': new ObjectId(prodId) },
-                            {
-                                $inc: { "products.$.quantity": 1 }
-                            }
-                        )
-                        console.log('quantity increased');
-                    } else {
-                        await cartDB.updateOne(
-                            { userId: new ObjectId(userId) },
-                            {
-                                $push: { products: { productId: new ObjectId(prodId) } }
-                            }
-                        )
+          try {
+            let existingCart = await cartDB.findOne({ userId: new ObjectId(userId) })
+            if (existingCart) {
+              console.log('existing cart');
+              let existingProd = existingCart.products.findIndex(product => product.productId == prodId)
+              if (existingProd !== -1) {
+                await cartDB.updateOne(
+                  { userId: new ObjectId(userId), 'products.productId': new ObjectId(prodId) },
+                  {
+                    $inc: { "products.$.quantity": 1 }
+                  }
+                )
+                console.log('quantity increased');
+              } else {
+                await cartDB.updateOne(
+                  { userId: new ObjectId(userId) },
+                  {
+                    $push: { products: { productId: new ObjectId(prodId) } }
+                  }
+                )
+              }
+              resolve()
+            } else {
+              await cartDB.create({
+                userId: new ObjectId(userId),
+                products: [{ productId: new ObjectId(prodId) }],
+                totalAmount: 0  // Add the totalAmount field with a default value of 0
+              })
+              console.log('cart created');
+              resolve()
+            }
+          } catch (error) {
+            console.log(error);
+            reject(error)
+          }
+        })
+      },
+    getAllCartItems: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            
+            let userCartItems = await cartDB.aggregate([
+                {
+                    $match: { userId: new ObjectId(userId) }
+                },
+                {
+                    $unwind: "$products"
+                },
+                {
+                    $project: {
+                        item: "$products.productId",
+                        quantity: "$products.quantity"
                     }
-                    resolve()
-                } else {
-                    await cartDB.create({
-                        userId: new ObjectId(userId),
-                        products: [{ productId: new ObjectId(prodId) }]
-                    })
-                    console.log('product created');
-                    resolve()
+                },
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: 'item',
+                        foreignField: '_id',
+                        as: 'product'
+                    }
+                },
+                {
+                    $project: {
+                        item: 1,
+                        quantity: 1,
+                        product: {
+                            $arrayElemAt: ['$product', 0]
+                        }
+                    }
                 }
-            } catch (error) {
-                console.log(error);
-                reject(error)
+            ]);
+
+
+            console.log("--------------------------------------");
+            console.log(userCartItems);
+            console.log("--------------------------------------");
+
+            resolve(userCartItems);
+
+        });
+
+    },
+    getCartCount: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            let count = 0;
+            let cart = await cartDB.findOne({ userId: userId })
+            if (cart) {
+                count = cart.products.length;
+            } else {
+                count = 0
+            }
+            resolve(count)
+        })
+    },
+    incDecProductQuantity: (userId, productId, quantity) => {
+        return new Promise(async (resolve, reject) => {
+            const cart = await cartDB.findOne({ userId: userId });
+            // console.log(cart);   //got a big output and solved
+            // console.log(",,,,,,,,,,,,,,,,,,,,,");
+            // console.log(productId);
+            // console.log(",,,,,,,,,,,,,,,,,,,,,");
+            const product = cart.products.find((items) => {
+                return items.productId.toString() == productId
+            }
+            );
+
+            let newQuantity = product.quantity + parseInt(quantity);
+
+            if (newQuantity < 1 || newQuantity > 10) {
+                newQuantity = 1;
+            }
+
+            product.quantity = newQuantity;
+            await cart.save();
+            resolve(newQuantity)
+
+        })
+    },
+    totalSubtotal: (userId, cartItems) => {
+        return new Promise(async (resolve, reject) => {
+            let cart = await cartDB.findOne({ userId: userId })
+            console.log(cart);
+            let total = 0;
+            if (cart) {
+
+                if (cartItems.length) {
+                    for (let i = 0; i < cartItems.length; i++) {
+                        total = total + (cartItems[i].quantity * cartItems[i].product.prodPrice);
+                    }
+                }
+                cart.totalAmount = total;
+                await cart.save()
+                console.log(total);
+                resolve(total)
+
+                // console.log("cartItemscartItemscartItems");
+                // console.log(cartItems);
+                // console.log("cartItemscartItemscartItems");
+            } else {
+                resolve(total)
             }
         })
+    },
+    removeAnItemFromCart: (cartId, productId) => {
+        return new Promise(async (resolve, reject) => {
+            cartDB.updateOne({ _id: cartId },
+                {
+                    $pull: { products: { productId: productId } }
+                }
+            ).then((result) => {
+                resolve(result)
+            })
+        })
+    },
+    decreaseStock:(cartItems)=>{
+        return new Promise(async (resolve,reject)=>{
+            console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{");
+            // console.log("decreaseStock0",cartItems);
+            for(let i=0;i<cartItems.length;i++){
+                let product = await products.findById({_id:cartItems[i].item});
+                // console.log("decreaseStock1",product);
+                const isProductAvailableInStock=(product.prodQuantity-cartItems[i].quantity)>0 ? true : false;
+                if(isProductAvailableInStock){
+                    product.prodQuantity=product.prodQuantity-cartItems[i].quantity;
+                }
+                // else{
+
+                // }
+                await product.save();
+                // console.log("decreaseStock2",product);
+            }
+            console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{");
+            resolve(true)
+        })
+    },
+    totalamount: (userId) => {
+        return new Promise(async (resolve, reject) => {
+          const cart = await cartDB.findOne({ userId: userId });
+          console.log(cart);
+          if (cart !== null) {
+            resolve(cart.totalAmount);
+            console.log("cart found ++++++++++++++++++++++++++++");
+          } else {
+            // Handle the case when cart is null
+            reject(new Error("Cart not found for the user"));
+          }
+        });
+      },
+      
+    clearCart: (userId) => {
+        return new Promise(async (resolve, reject) => {
+            await cartDB.findOneAndUpdate(
+                { userId: userId },
+                { $set: { products: [] } }, 
+                { new: true })
+
+                .then((result)=>{
+                    resolve(result)
+                })
+        })
+
     }
+
+ 
 }

@@ -1,9 +1,13 @@
+    
+    const users = require("../models/userModel")
+    
 
     const userAuthenticationCheck=async (req,res,next)=>{
 
         try{
             if(req.session.user){
                 res.status(200).redirect('/home')
+                
                 
             }else{
                 next()
@@ -20,7 +24,7 @@
             if(req.session.user){
                 next()
             }else{
-                res.status(200).redirect('/home')
+                res.status(200).redirect('/')
             }
         }catch(error){
             res.status(500).redirect({message:"internal error occured"})

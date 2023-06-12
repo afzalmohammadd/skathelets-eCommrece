@@ -1,0 +1,322 @@
+<!-- <link href="/user/assets/css/admin-main-copy.css" rel="stylesheet" type="text/css" /> -->
+
+
+<style>
+    .orderDetailspage-card-left {
+        padding: 27px;
+        background: #f8f9fa;
+        border-radius: 20px 0px 0px 20px;
+    }
+
+    .orderDetailspage-card-middle {
+        padding: 27px;
+        background: #f8f9fa;
+
+    }
+
+    b {
+        font-weight: 500;
+    }
+
+    .orderDetailspage-card-right {
+        padding: 27px;
+        background: #f8f9fa;
+        border-radius: 0px 20px 20px 0px;
+    }
+
+    .table> :not(:last-child)> :last-child>* {
+        border-bottom-color: currentColor;
+    }
+
+    .rounded-pill {
+        padding-right: 0.6em;
+        padding-left: 0.6em;
+    }
+
+    .text-success {
+        color: #00B517 !important;
+    }
+
+    .rounded-pill {
+        border-radius: 50rem !important;
+    }
+
+    .alert-success {
+        color: #006d0e;
+        background-color: #ccf0d1;
+        border-color: #b3e9b9;
+    }
+
+
+
+    .float-end {
+        float: right !important;
+    }
+
+    .content-header .content-title {
+        margin-bottom: 0;
+    }
+
+    .card-title {
+        color: #383e50 !important;
+    }
+
+    .card-title {
+        margin-bottom: 1rem;
+        font-size: 40px;
+    }
+
+
+    .text-muted {
+        color: #adb5bd !important;
+    }
+</style>
+
+<link rel="stylesheet" href="../../public/admin/assets/css/vendors/material-icon-round.css">
+<script src="https://unpkg.com/easyinvoice/dist/easyinvoice.min.js"></script>
+
+
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h1 class="content-title card-title">Order details</h1>
+<!-- lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll -->
+            <%= console.log("orderdetails",orderdetails,"orderdetailsorderDetails"); %>
+<!-- lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll -->
+
+        </div>
+    </div>
+    <div class="card">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-6 mb-lg-0  pt-3">
+                    <span class="ml-4">
+                        <i class="material-icons md-calendar_today"></i> <b> <%=orderdetails.orderDate%></b>
+                    </span> <br>
+                    <small class="text-muted ml-4">Order ID: <%= orderdetails._id %></small>
+                </div>
+                
+            </div>
+
+        </header> <!-- card-header end// -->
+        <hr>
+        <div class="card-body">
+            <div class="row mb-50 mt-20 order-info-wrap">
+                <div class="col-md-4 orderDetailspage-card-left">
+                    <article class="icontext align-items-start">
+                        <span class="icon icon-sm rounded-circle bg-primary-light">
+                            <i class="text-primary material-icons md-person"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Customer</h6>
+                            <p class="mb-1">
+
+                                <%= orderdetails.address?.first_name %>
+                                    <%= orderdetails.address?.last_name %> <template class="__cf_email__"
+                                            data-cfemail="e2838e879aa2879a838f928e87cc818d8f">[email&#160;protected]</template>
+                                        <br> +91 <%= orderdetails.address?.mobile %>
+                            </p>
+                            <a href="">View profile</a>
+                        </div>
+                    </article>
+                </div> <!-- col// -->
+                <div class="col-md-4 orderDetailspage-card-middle">
+                    <article class="icontext align-items-start">
+                        <span class="icon icon-sm rounded-circle bg-primary-light">
+                            <i class="text-primary material-icons md-local_shipping"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Order info</h6>
+                            <p class="mb-1">
+                                Shipping: Fargo express <br> Pay method: <%= orderdetails.paymentMethod %> <br> Status:
+                                    new
+                            </p>
+                        </div>
+                    </article>
+                </div> <!-- col// -->
+                <div class="col-md-4 orderDetailspage-card-right">
+                    <article class="icontext align-items-start">
+                        <span class="icon icon-sm rounded-circle bg-primary-light">
+                            <i class="text-primary material-icons md-place"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Deliver to</h6>
+                            <p class="mb-1">
+                                City : <%= orderdetails.address?.city %>
+                            </p>
+                            <p class="mb-1">
+                                Address : <%= orderdetails.address?.address %>
+                            </p>
+                        </div>
+                    </article>
+                </div> <!-- col// -->
+            </div> <!-- row // -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th width="40%">Product</th>
+                                    <th width="20%">Unit Price</th>
+                                    <th width="20%">Quantity</th>
+                                    <th width="20%" class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for( let i=0; i < productDetails.length; i++ ) { %>
+                                    <tr>
+                                        <td>
+                                            <a class="itemside" href="#">
+                                                <div class="left">
+                                                    <img src="/uploads/<%= productDetails[i].orderedProduct.prodImage[0] %> %>"
+                                                        width="40" height="40" class="img-xs" alt="Item">
+                                                </div>
+                                                <div class="info">
+                                                    <%=productDetails[i].orderedProduct.prodName%>
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <%=productDetails[i].orderedProduct.prodPrice%>
+                                        </td>
+                                        <td>
+                                            <%=productDetails[i].orderedItems.quantity%>
+                                        </td>
+                                        <td class="text-end">
+                                            <%=productDetails[i].orderedProduct.prodPrice*productDetails[i].orderedItems.quantity%>
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                                        <tr>
+                                            <!-- <div class="col-lg-6 col-md-6 mb-lg-0  pt-3">
+                                            </div> -->
+                                            <td colspan="4">
+                                                <article class="float-end">
+                                                    <dl class="dlist">
+                                                        <dt>Subtotal:</dt>
+                                                        <dd><%= orderdetails.totalAmount %></dd>
+                                                    </dl>
+                                                    <dl class="dlist">
+                                                        <dt>Shipping cost:</dt>
+                                                        <dd>$60.00</dd>
+                                                    </dl>
+                                                    <dl class="dlist">
+                                                        <dt>Grand total:</dt>
+                                                        <dd> <b class="h5">
+                                                            <%= orderdetails.totalAmount +60 %>
+                                                            </b> </dd>
+                                                    </dl>
+                                                    <dl class="dlist">
+                                                        <dt class="text-muted"><%=orderdetails.orderStatus%></dt>
+                                                        <dd>
+                                                            <span
+                                                                class="badge rounded-pill alert-success text-success"><%= orderdetails.orderStatus %></span>
+                                                        </dd>
+                                                    </dl>
+                                                    <% if (orderdetails.orderStatus !== 'delivered' && orderdetails.orderStatus !== 'canceled' && orderdetails.orderStatus !== 'return pending' && orderdetails.orderStatus !== 'returned') { %>
+                                                        <button class="float-left ml-5" style="background-color: rgb(205, 120, 120);" onclick="cancelOrder('<%= orderdetails.user %>','<%= orderdetails._id %>')">Cancel order</button>
+                                                      <% } %>
+                                                        
+
+
+                                                    <% if (orderdetails.orderStatus == 'return pending') { %>
+                                                        <button class="float-left ml-5 " style="background-color: rgb(60, 109, 182);" onclick="returnOrder('<%= orderdetails.user %>','<%= orderdetails._id %>')">Return order</button>
+                                                    <% } %>
+
+                                                </article>
+                                            </td>
+                                        </tr>
+                            </tbody>
+                        </table>
+
+                        <input type="hidden" id="orderdetails" value="<%= JSON.stringify(orderdetails) %>">
+                        <input type="hidden" name="" id="productDetails" value="<%= JSON.stringify(productDetails) %>">
+                    </div> <!-- table-responsive// -->
+                </div> <!-- col// -->
+            </div>
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+</section> <!-- content-main end// -->
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script>
+    function cancelOrder(userId,orderId){
+        console.log("clicked",userId);
+
+        swal("do you want to Cancel This Order", {
+            buttons: ['No', 'Yes']
+        })
+        .then((res)=>{
+            if(res){
+                $.ajax({
+                    url:'/admin/cancel-order',
+                    method:'post',
+                    data:{
+                        userId:userId,
+                        orderId:orderId
+                    }
+                })
+                .done((res)=>{
+                    console.log(res);
+                    Toastify({
+							text: `${res.message}`,
+							duration: 3000,
+							newWindow: true,
+							close: true,
+							gravity: "top", // `top` or `bottom`
+							position: "center", // `left`, `center` or `right`
+							stopOnFocus: true, // Prevents dismissing of toast on hover
+							style: {
+								background: "linear-gradient(to right, #00b09b, #96c93d)",
+							},
+
+						}).showToast();
+                        location.reload()
+                })
+            }
+        })
+    }
+
+
+    function returnOrder(userId,orderId){
+        console.log("clicked",userId);
+
+        swal("do you want to Retrun This Order", {
+            buttons: ['No', 'Yes']
+        })
+        .then((res)=>{
+            if(res){
+                $.ajax({
+                    url:'/admin/return-order',
+                    method:'post',
+                    data:{
+                        userId:userId,
+                        orderId:orderId
+                    }
+                })
+                .done((res)=>{
+                    console.log(res);
+                    Toastify({
+							text: `${res.message}`,
+							duration: 3000,
+							newWindow: true,
+							close: true,
+							gravity: "top", // `top` or `bottom`
+							position: "center", // `left`, `center` or `right`
+							stopOnFocus: true, // Prevents dismissing of toast on hover
+							style: {
+								background: "linear-gradient(to right, #00b09b, #96c93d)",
+							},
+
+						}).showToast();
+                        location.reload()
+                })
+            }
+        })
+    }
+</script>

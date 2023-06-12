@@ -6,6 +6,7 @@ const password = "123";
 const categories = require('../models/categoryModel')
 const products = require('../models/productModel')
 const orderhelper = require("../helpers/orderhelper")
+const coupenHelper = require("../helpers/coupenHelper")
 const orders = require('../models/orderModel')
 const excelJs = require('exceljs')
 
@@ -395,7 +396,76 @@ module.exports = {
   // currencyFormat:(amount)=>{
   //   return Number(amount).toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
   // }
-  
+   
+  coupons:async(req,res)=>{
+    try{
+      let allCoupons = await coupenHelper.getAllCoupons()
+
+      res.render("admin/coupon",{ coupons: allCoupons, layout: "layouts/adminLayout" })
+
+      
+    }catch(error){
+
+    }
+  },
+
+  postAddCoupon:async(req,res)=>{
+    try{
+      coupenHelper.addCouponToDB(req.body)
+      .then((coupon)=>{
+        res.status(202).redirect('/admin/coupon')
+      })
+      .catch((error)=>{
+        console.log(error);
+      })
+    }catch(error){
+
+    }
+  },
+
+  productOrderDetailsAdmin: async (req, res) => {
+    try {
+        const orderId = req.params.id
+        let orderdetails = await orderhelper.getOrderedUserDetailsAndAddress(orderId); //got user details
+
+        let productDetails = await orderhelper.getOrderedProductsDetails(orderId); //got ordered products details
+
+        console.log("inside productOrderDetails");
+        
+        
+        res.render('admin/order-details-admin', {
+            layout: "layouts/adminLayout",
+            orderdetails, productDetails
+        })
+    } catch (error) {
+
+    }
+},
+
+orderCancel:async(req,res) =>{
+
+  const userId = req.body.userId;
+  const orderId = req.body.orderId;
+
+  try{
+      const cancelled = await orderhelper.cancelorder(orderId)
+      res.status(200).json({ isCancelled: true, message: "order canceled successfully" })
+  }catch(error){
+      console.log(error);
+  }
+},
+
+orderReturn:async(req,res) =>{
+  const userId = req.body.userId
+  const orderId = req.body.orderId
+
+  try{
+      const returnOrder = await orderhelper.orderReturn(userId,orderId)
+      res.status(200).json({isreturned: 'return pending', message:"user is returning the order"})
+  }catch(error){
+      console.log(error);
+  }
+}
 
 
 }

@@ -168,6 +168,14 @@
 
             </div>
             <div class="col-lg-4">
+                <div class="input-group">
+                    <input type="text" name="couponCode" id="couponCode" class="form-control p-4" placeholder="Coupon Code">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" onclick="applyCoupon('<%= totalAmount %>')" >Apply Coupon</button>
+                    </div>
+                </div>
+                <span id="couponApplySuccess" class="text-success"></span>
+				<span id="couponApplyFail" class="text-danger"></span>
                 <div class="card border-secondary mb-5">
 
                     <div class="card-header bg-secondary border-0">
@@ -199,9 +207,24 @@
 
 
                     <div class="card-footer border-secondary bg-transparent">
+
+                        <div class="d-flex justify-content-between mt-2">
+                            <h5 class="font-weight-bold">Subtotal</h5>
+                            <h5   class="font-weight-bold">
+                                <%= totalAmount %>
+                            </h5>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-2">
+                            <h5 class="font-weight-bold">Discount</h5>
+                            <h5 id="discount"  class="font-weight-bold">
+                                0.00
+                            </h5>
+                        </div>
+
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold">
+                            <h5 class="font-weight-bold" id="totalAmount"  >
                                 <%= totalAmount %>
                             </h5>
                         </div>
@@ -373,6 +396,8 @@
 </div>
 <!-- Checkout End -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="path/to/toastify.js"></script>
+
 <script>
     $(document).ready(function () {
         $('#checkout-form').submit((e) => {
@@ -539,4 +564,36 @@
                 })
         })
     })
+
+    function applyCoupon(totalAmount) {
+		const couponCode = document.getElementById('couponCode').value;
+		console.log(couponCode)
+        console.log(totalAmount)
+
+		$.ajax({
+			url: '/apply-coupon',
+			type: 'post',
+			data: {
+				couponCode: couponCode,
+			}
+		})
+			.done((res) => {
+				if (res.status) {
+					console.log("hello");
+					console.log(res);
+					document.getElementById('couponApplyFail').classList.add('d-none')
+					document.getElementById('couponApplySuccess').classList.remove('d-none')
+					document.getElementById('couponApplySuccess').innerHTML = res.message
+					document.getElementById('discount').innerHTML = -res.discount
+					document.getElementById('totalAmount').innerHTML = res.cart.totalAmount
+				} else {
+					console.log(res);
+					document.getElementById('couponApplySuccess').classList.add('d-none')
+					document.getElementById('couponApplyFail').classList.remove('d-none')
+					document.getElementById('couponApplyFail').innerHTML = res.message
+
+
+				}
+			})
+	}
 </script>

@@ -16,6 +16,7 @@ const ObjectId = require('mongoose').Types.ObjectId
 
 const Razorpay = require('razorpay');
 const { log } = require('console')
+const coupenHelper = require('../helpers/coupenHelper')
 
 var instance = new Razorpay({
     key_id: 'rzp_test_uqjS5a2hmaYBoQ',
@@ -76,9 +77,9 @@ module.exports = {
     },
     signupPOST: async (req, res) => {
         let response = {}
-        console.log(req.body);
+        // console.log(req.body);
         userhelper.dosignup(req.body).then((response) => {
-            console.log(response);
+            // console.log(response);
             if (!response.isUserExist) {
                 res.render('shop/home', {
                     layout: "layouts/userLayout",
@@ -99,11 +100,11 @@ module.exports = {
         console.log(req.body);
 
         userhelper.dologin(req.body).then((response) => {
-            console.log(response.user)
+            // console.log(response.user)
 
 
             if (response.blockUser) {
-                console.log("user blocked");
+                // console.log("user blocked")
                 res.render('shop/login.ejs', {
                     layout: "layouts/userLayout",
                     user: true,
@@ -111,14 +112,14 @@ module.exports = {
                 })
             } else {
                 if (response.loggedin) {
-                    console.log("user succesfully loggedin");
+                    // console.log("user succesfully loggedin");
                     req.session.user = response.user
-                    console.log("aaaaaaaaaffffffffffffff", req.session.user);
+                    // console.log("aaaaaaaaaffffffffffffff", req.session.user);
                     Status = response.user
                     loginStatus = true
                     loginUser = req.session.user
-                    console.log(req.session.user);
-                    console.log(response.user + "klkl");
+                    // console.log(req.session.user);
+                    // console.log(response.user + "klkl");
                     res.render('shop/home', {
                         layout: "layouts/userLayout",
                         Status
@@ -139,7 +140,7 @@ module.exports = {
         try {
             req.session.user = false
             loginStatus = false
-            console.log("logout succesfull");
+            // console.log("logout succesfull");
             res.render('shop/home', {
                 layout: "layouts/userLayout",
 
@@ -160,12 +161,12 @@ module.exports = {
         }
     },
     forgotpassPOST: async (req, res) => {
-        console.log("---------")
-        console.log(req.body.phone)
+        // console.log("---------")
+        // console.log(req.body.phone)
         check = req.body
         await users.findOne({ phonenumber: check.phone }).then(async (userData) => {
             if (userData) {
-                console.log(userData + "find mobile no from db")
+                // console.log(userData + "find mobile no from db")
                 const alreadyExisted = userData
                 await twilio.sentOtp(check.phone)
                     .then((result) => {
@@ -185,7 +186,7 @@ module.exports = {
         })
     },
     otpVerifyingforPass: async (req, res) => {
-        console.log(req.body)
+        // console.log(req.body)
         const mobileNo = check.phone
         const otpFor = req.body.otp
         await twilio.verifyOtp(mobileNo, otpFor)
@@ -195,7 +196,7 @@ module.exports = {
                         layout: "layouts/userLayout",
                         user: true
                     })
-                    console.log("CCCCCCCPPPPPPPPP");
+                    // console.log("CCCCCCCPPPPPPPPP");
                 } else {
                     res.redirect('/shop/forgotpass', {
                         layout: "layouts/userLayout",
@@ -219,10 +220,10 @@ module.exports = {
             try {
                 if (userData) {
                     userData.password = await bcrypt.hash(newPassword, 10);
-                    console.log(userData.password);
+                    // console.log(userData.password);
 
                     const updatedUser = await users.findByIdAndUpdate(userData._id, { password: userData.password }, { new: true });
-                    console.log("Password updated successfully:", updatedUser);
+                    // console.log("Password updated successfully:", updatedUser);
                     res.render('shop/login', {
                         layout: "layouts/userLayout",
                         user: true
@@ -257,10 +258,10 @@ module.exports = {
     otpSending: async (req, res) => {
         const find = req.body
         req.session.mobile = req.body.phone
-        console.log(req.body.phone);
+        // console.log(req.body.phone);
         await users.findOne({ phonenumber: find.phone }).then(async (userData) => {
             if (userData) {
-                console.log(userData + "find mobile no from db");
+                // console.log(userData + "find mobile no from db");
                 req.session.tempUser = userData
                 await twilio.sentOtp(find.phone)
                     .then((result) => {
@@ -286,15 +287,15 @@ module.exports = {
     },
     // otp verifying in login process
     otpVerifying: async (req, res) => {
-        console.log("check ver");
+        // console.log("check ver");
         const phone = req.session.mobile
         const otp = req.body.otp
-        console.log("this is otp  ", otp);
+        // console.log("this is otp  ", otp);
         await twilio.verifyOtp(phone, otp)
             .then((status) => {
-                console.log("--------------------");
-                console.log(status);
-                console.log("--------------------");
+                // console.log("--------------------");
+                // console.log(status);
+                // console.log("--------------------");
 
                 if (status) {
                     req.session.user = req.session.tempUser
@@ -318,7 +319,7 @@ module.exports = {
             let viewCategory = await categories.find({})
             let viewPoducts = await products.find({ unList: false });
 
-            console.log(viewPoducts);
+            // console.log(viewPoducts);
             if (viewPoducts) {
                 res.render('shop/shopping', {
                     layout: "layouts/userLayout",
@@ -344,7 +345,7 @@ module.exports = {
     },
     getdetail: async (req, res) => {
         try {
-            console.log("shop detail")
+            // console.log("shop detail")
             let viewproduct = await products.findById({ _id: req.params.id })
 
             if (viewproduct) {
@@ -375,11 +376,11 @@ module.exports = {
             let prodId = req.params.id
             let userID = req.session.user._id
 
-            console.log('product id : ' + prodId + " " + "user id : " + userID);
-            console.log('api called');
+            // console.log('product id : ' + prodId + " " + "user id : " + userID);
+            // console.log('api called');
             userhelper.addToCart(prodId, userID)
                 .then((response) => {
-                    console.log('got the response for adding to  cart');
+                    // console.log('got the response for adding to  cart');
                     res.redirect('/getShoppingCart')
                 })
         } catch (error) {
@@ -388,7 +389,7 @@ module.exports = {
     },
 
     cart: async (req, res) => {
-        console.log("in cart");
+        // console.log("in cart");
         try {
             let user = req.session.user;
             let cartItems = await userhelper.getAllCartItems(user._id)
@@ -396,9 +397,9 @@ module.exports = {
             let totalandSubTotal = await userhelper.totalSubtotal(user._id, cartItems)
 
 
-            console.log("cartItems");
-            console.log(totalandSubTotal);
-            console.log("cartItems");
+            // console.log("cartItems");
+            // console.log(totalandSubTotal);
+            // console.log("cartItems");
 
             res.render('shop/cart', {
                 layout: "layouts/userLayout",
@@ -443,7 +444,7 @@ module.exports = {
 
             userhelper.removeAnItemFromCart(cartId, productId)
                 .then((response) => {
-                    console.log("sucessfully deleted");
+                    // console.log("sucessfully deleted");
                     res.status(202).json({ message: "sucessfully item removed" })
                 })
         } catch (error) {
@@ -459,12 +460,12 @@ module.exports = {
             let totalAmount = await userhelper.totalSubtotal(user._id, cartItems);
             totalAmount = totalAmount.toLocaleString('en-in', { style: 'currency', currency: 'INR' })
             const userAddress = await addressHelper.findAddresses(user._id)
-            console.log("[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]")
-            console.log(userAddress)
-            console.log("[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]")
+            // console.log("[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]")
+            // console.log(userAddress)
+            // console.log("[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]")
 
-            console.log("vvvvvvvvvvvvvvvvvvv");
-            console.log(cartItems);
+            // console.log("vvvvvvvvvvvvvvvvvvv");
+            // console.log(cartItems);
             // for (let i = 0; i < cartItems.length; i++) {
             //     if (cartItems[i].product) {
             //         cartItems[i].product.prodPrice = cartItems[i].product.product_price.toLocaleString('en-in', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
@@ -475,7 +476,7 @@ module.exports = {
 
             // }
             // console.log(loginStatus);
-            console.log("AAAAAAAAAAAAAAAAAAAAAA");
+            // console.log("AAAAAAAAAAAAAAAAAAAAAA");
 
             res.render('shop/checkout', { layout: "layouts/userLayout", loginUser, cartCount, user, totalAmount: totalAmount, cartItems, address: userAddress, Status })
         } catch (error) {
@@ -484,10 +485,10 @@ module.exports = {
     },
     addAddress: async (req, res) => {
         try {
-            console.log("trying to add address");
-            console.log("-------------------------------");
-            console.log(req.body);
-            console.log("-------------------------------");
+            // console.log("trying to add address");
+            // console.log("-------------------------------");
+            // console.log(req.body);
+            // console.log("-------------------------------");
             addressHelper.addAddress(req.body)
                 .then((response) => {
                     // console.log(response)
@@ -504,9 +505,9 @@ module.exports = {
 
     editAddress: async (req, res) => {
         try {
-            console.log("controller", req.params.id);
+            // console.log("controller", req.params.id);
             let address = await addressHelper.getAnAddress(req.params.id);
-            console.log("controller", address);
+            // console.log("controller", address);
             res.json({ address: address })
         } catch (error) {
             console.log(error);
@@ -516,7 +517,7 @@ module.exports = {
         try {
 
             let addressUpdated = await addressHelper.editAnAddress(req.body);
-            console.log(addressUpdated);
+            // console.log(addressUpdated);
             res.json({ message: "address updated" })
 
         } catch (error) {
@@ -554,12 +555,12 @@ module.exports = {
                 const orderId = await orderhelper.orderGetting(req.body, totalAmount, cartItems);
                 await userhelper.decreaseStock(cartItems);
                 await userhelper.clearCart(userId);
-                console.log("inside online payment");
-                console.log(orderId);
+                // console.log("inside online payment");
+                // console.log(orderId);
                 try {
                     const response = await orderhelper.generateRazorpay(orderId, totalAmount);
-                    console.log("sally");
-                    console.log(response, "555555555555555555555555555555555555555555555555555555555555555555555555555555555");
+                    // console.log("sally");
+                    // console.log(response, "555555555555555555555555555555555555555555555555555555555555555555555555555555555");
                     res.status(200).json({ response, payment: req.body.payment });
                 } catch (error) {
                     console.log(error);
@@ -573,7 +574,7 @@ module.exports = {
     },
     orderSuccess: (req, res) => {
         try {
-            console.log("this is order success function");
+            // console.log("this is order success function");
             res.render('shop/order-success', {
                 layout: "layouts/userLayout",
                 loginStatus,
@@ -586,12 +587,12 @@ module.exports = {
     orders: async (req, res) => {
         try {
             const user = req.session.user
-            let userOrderDetails = await orderhelper.getAllOrderDetailsOfAUser(user._id);
-            console.log("userController here ", userOrderDetails)
+            let userOrderDetails = await orderhelper.getAllOrderDetailsOfAUser(user._id)
+            // console.log("userController here ", userOrderDetails)
 
 
-            console.log("orders", userOrderDetails)
-            console.log("order-user   ++++___++")
+            // console.log("orders", userOrderDetails)
+            // console.log("order-user   ++++___++")
             res.render('shop/orders-user', {
                 layout: "layouts/userLayout",
                 loginStatus,
@@ -603,19 +604,6 @@ module.exports = {
             console.log(error);
         }
     },
-    orderCancelling: async (req, res) => {
-        console.log("inside usercontroller for cancelling order");
-        try {
-            console.log("hoooo");
-            const orderId = req.params.id
-            console.log(orderId);
-            let userOrderCancelling = await orderhelper.cancelOrder(orderId)
-            res.redirect('/orders')
-            console.log(userOrderCancelling);
-        } catch (error) {
-
-        }
-    },
     productOrderDetails: async (req, res) => {
         try {
             const orderId = req.params.id
@@ -623,10 +611,12 @@ module.exports = {
 
             let productDetails = await orderhelper.getOrderedProductsDetails(orderId); //got ordered products details
 
-
+            console.log("inside productOrderDetails");
+            
+            
             res.render('shop/order-details-user', {
                 layout: "layouts/userLayout",
-
+                user:true,
                 orderdetails, productDetails, loginStatus, Status
             })
         } catch (error) {
@@ -636,19 +626,19 @@ module.exports = {
     verifypayment: async (req, res) => {
 
         try {
-            console.log("inside verifypayment");
+            // console.log("inside verifypayment");
             let details = req.body;
-            console.log(details, "++++++++++++++++++++++"); // Check the received details
+            // console.log(details, "++++++++++++++++++++++"); // Check the received details
 
             const crypto = require("crypto");
             let hmac = crypto.createHmac("sha256", "LmAP75P7IfisHinnntdOcN2f");
             hmac.update(details["payment[razorpay_order_id]"] + "|" + details["payment[razorpay_payment_id]"]);
             hmac = hmac.digest("hex");
             let orderResponse = details["order[response][receipt]"];
-            console.log(orderResponse);
+            // console.log(orderResponse);
             let orderObjId = new ObjectId(orderResponse);
 
-            console.log(details["payment"]);
+            // console.log(details["payment"]);
 
             if (hmac === details["payment[razorpay_signature]"]) {
                 let user = req.session.user;
@@ -664,7 +654,7 @@ module.exports = {
                     }
                 );
 
-                console.log("Payment is successful RazorPay");
+                // console.log("Payment is successful RazorPay");
                 res.json({ status: true });
             } else {
                 await orderDB.updateOne(
@@ -686,11 +676,11 @@ module.exports = {
     },
     profile: async (req, res) => {
         try {
-            console.log("in profile");
+            // console.log("in profile");
             const user = req.session.user._id
             const userData = await users.findById(user)
             const userAddress = await addressHelper.findAddresses(user)
-            console.log(userData,"ddddddddddddssssssssssssssss");
+            // console.log(userData,"ddddddddddddssssssssssssssss");
 
             res.render('shop/UserAccount', {
                 layout: "layouts/userLayout",
@@ -705,12 +695,48 @@ module.exports = {
     filterByCategory:async(req,res)=>{
         try{
             let category=req.body.categoryId
-            console.log("inside FILTER-BY-CATEGORY");
-            console.log(category);
+            // console.log("inside FILTER-BY-CATEGORY");
+            // console.log(category);
             const filteredProd = await products.find({ prodCategory: category })
-            console.log("Filtered By Category",filteredProd)
+            // console.log("Filtered By Category",filteredProd)
 
             res.status(200).json({ products: filteredProd })
+        }catch(error){
+            console.log(error);
+        }
+    },
+    applyCoupon:async(req,res)=>{
+        try{
+            const  user=req.session.user
+            const {totalAmount,couponCode}=req.body
+            const response =await coupenHelper.applyCoupon(user._id,couponCode)
+
+            res.status(202).json(response)
+        }catch(error){
+
+        }
+    },
+
+    cancelOrder:async(req,res) =>{
+
+        const userId = req.body.userId;
+        const orderId = req.body.orderId;
+
+        try{
+            const cancelled = await orderhelper.cancelorder(orderId)
+            res.status(200).json({ isCancelled: true, message: "order canceled successfully" })
+        }catch(error){
+            console.log(error);
+        }
+    },
+
+    returnOrder:async(req,res) =>{
+        const userId = req.body.userId
+        const orderId = req.body.orderId
+
+        try{
+            const returnOrder = await orderhelper.orderReturn(userId,orderId)
+            res.status(200).json({isreturned: 'return pending', message:"user is returning the order"})
         }catch(error){
             console.log(error);
         }

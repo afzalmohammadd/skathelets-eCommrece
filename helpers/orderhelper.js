@@ -27,9 +27,9 @@ module.exports = {
             let paymentMethod = order.payment;
             let addressId = order.addressSelected;
             let orderedItems = cartItems
-            console.log("orderedItems", orderedItems)
+            // console.log("orderedItems", orderedItems)
 
-            console.log("orderedItems orderHelper ", orderedItems)
+            // console.log("orderedItems orderHelper ", orderedItems)
             let ordered = new orderSchema({
                 user: userId,
                 address: addressId,
@@ -40,7 +40,7 @@ module.exports = {
                 orderedItems: orderedItems
             })
             await ordered.save();
-            console.log("upoladed to dbbbbbbbbbbbbbbb")
+            // console.log("upoladed to dbbbbbbbbbbbbbbb")
             resolve(ordered)
         })
     },
@@ -63,23 +63,11 @@ module.exports = {
                 }
             ]);
 
-            console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-            console.log("This is aggregation result", userOrderDetails);
-            console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            // console.log("This is aggregation result", userOrderDetails);
+            // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
             resolve(userOrderDetails);
-        });
-    },
-    cancelOrder: (orderId) => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const updatedOrder = await orderSchema.findByIdAndUpdate(orderId, { orderStatus: 'canceled' }, { new: true })
-                console.log('Order status updated successfully:', updatedOrder);
-                resolve(updatedOrder);
-            } catch (err) {
-                console.error('Error updating order status:', err);
-                reject(err);
-            }
         });
     },
     getOrderedUserDetailsAndAddress: (orderId) => {
@@ -100,6 +88,8 @@ module.exports = {
                 {
                     $project: {
                         user: 1,
+                        orderDate:1,
+                        orderStatus:1,
                         totalAmount: 1,
                         paymentMethod: 1,
                         address: {
@@ -133,7 +123,7 @@ module.exports = {
                     $unwind: '$orderedProduct'
                 }
             ]).then((result) => {
-                console.log("orders", result);
+                // console.log("orders", result);
                 resolve(result)
             })
         })
@@ -154,7 +144,7 @@ module.exports = {
                 }
             ])
                 .then((result) => {
-                    console.log(result);
+                    // console.log(result);
                     resolve(result)
                 })
         })
@@ -190,9 +180,9 @@ module.exports = {
             let paymentMethod = order.payment;
             let addressId = order.addressSelected;
             let orderedItems = cartItems
-            console.log("orderedItems", orderedItems);
+            // console.log("orderedItems", orderedItems);
 
-            console.log("orderedItems orderHelper ", orderedItems);
+            // console.log("orderedItems orderHelper ", orderedItems);
             let ordered = new orderSchema({
                 user: userId,
                 address: addressId,
@@ -203,14 +193,14 @@ module.exports = {
                 orderedItems: orderedItems
             })
             await ordered.save();
-            console.log("upoladed to dbbbbbbbbbbbbbbb");
+            // console.log("upoladed to dbbbbbbbbbbbbbbb");
             resolve(ordered._id);
         })
     },
     generateRazorpay: (orderId, total) => {
         return new Promise((resolve, reject) => {
             var instance = new Razorpay({ key_id: 'rzp_test_uqjS5a2hmaYBoQ', key_secret: 'LmAP75P7IfisHinnntdOcN2f' });
-            console.log("inside razorpay");
+            // console.log("inside razorpay");
             instance.orders.create(
               {
                 amount: total*100,
@@ -220,10 +210,10 @@ module.exports = {
               (error, order) => {
                 if (order) {
                   
-                  console.log("order+++++razorpay", order);
+                //   console.log("order+++++razorpay", order);
                   resolve(order)
                 } else {
-                    console.log("error++++++", error);
+                    // console.log("error++++++", error);
                     reject(error);
                 }
               }
@@ -255,7 +245,7 @@ module.exports = {
               }
             ])
           .then((result) => {
-            console.log("inside orderhelper ",result);
+            // console.log("inside orderhelper ",result);
             resolve(result);
           })
           .catch((error) => {
@@ -268,13 +258,46 @@ module.exports = {
             try{
                 await orderSchema.find({orderDate:{$gte:startDate,$lte:endDate},orderStatus:"delivered"}).lean()
                 .then((result)=>{
-                    console.log("orders in the provided date",result)
+                    // console.log("orders in the provided date",result)
                     resolve(result)
                 })
             }catch(error){
                 console.log(error)
                 resolve(error)
             }
+        })
+      },
+      cancelorder:(orderId)=>{
+        return new Promise(async(resolve,reject)=>{
+
+            const cancelledResponse = await orderSchema.findByIdAndUpdate(
+                {_id: new ObjectId(orderId) },
+                {$set: {orderStatus:"canceled"}},
+                {new:true}
+            )
+    
+            console.log("cancelled Response",cancelledResponse)
+
+            resolve(cancelledResponse.orderStatus)
+
+        })
+
+      },
+
+      orderReturn:(userId,orderId)=>{
+        return new Promise(async(resolve,reject)=>{
+            const order = await orderSchema.findOne({_id: new ObjectId(orderId)})
+            console.log("inside returnOrder",order)
+
+            if(order.orderStatus=='delivered'){
+                order.orderStatus='return pending'
+            }else if(order.orderStatus=='return pending'){
+                order.orderStatus='returned'
+            }
+
+            await order.save()
+            console.log("after the order returned",order)
+            resolve(order)
         })
       }
       

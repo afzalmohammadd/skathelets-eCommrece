@@ -12,7 +12,7 @@ module.exports={
     dosignup:(userData)=>{
         return new Promise (async(resolve,reject)=>{
             const isUserExist=await users.findOne({email:userData.email})
-             console.log(userData);
+            //  console.log(userData);
             if(!isUserExist){
                 userData.password=await bcrypt.hash(userData.password,10)
 
@@ -35,7 +35,7 @@ module.exports={
     dologin:(userData)=>{
         return new Promise (async(resolve,reject)=>{
             let user=await users.findOne({email:userData.email})
-            console.log(user);
+            // console.log(user);
             let response={}
             if(user){
                 bcrypt.compare(userData.password,user.password).then((result)=>{
@@ -47,9 +47,9 @@ module.exports={
                             if(result){
                                 response.user=user
                                 response.loggedin=true
-                                console.log("login success");
+                                // console.log("login success");
                                 resolve(response) 
-                                console.log(response+"hai response");                      
+                                // console.log(response+"hai response");                      
                             }else{
                                 resolve({loggedin:false})
                                 console.log("login failed");
@@ -71,7 +71,7 @@ module.exports={
           try {
             let existingCart = await cartDB.findOne({ userId: new ObjectId(userId) })
             if (existingCart) {
-              console.log('existing cart');
+            //   console.log('existing cart');
               let existingProd = existingCart.products.findIndex(product => product.productId == prodId)
               if (existingProd !== -1) {
                 await cartDB.updateOne(
@@ -80,7 +80,7 @@ module.exports={
                     $inc: { "products.$.quantity": 1 }
                   }
                 )
-                console.log('quantity increased');
+                // console.log('quantity increased');
               } else {
                 await cartDB.updateOne(
                   { userId: new ObjectId(userId) },
@@ -96,7 +96,7 @@ module.exports={
                 products: [{ productId: new ObjectId(prodId) }],
                 totalAmount: 0  // Add the totalAmount field with a default value of 0
               })
-              console.log('cart created');
+            //   console.log('cart created');
               resolve()
             }
           } catch (error) {
@@ -141,9 +141,9 @@ module.exports={
             ]);
 
 
-            console.log("--------------------------------------");
-            console.log(userCartItems);
-            console.log("--------------------------------------");
+            // console.log("--------------------------------------");
+            // console.log(userCartItems);
+            // console.log("--------------------------------------");
 
             resolve(userCartItems);
 
@@ -189,7 +189,7 @@ module.exports={
     totalSubtotal: (userId, cartItems) => {
         return new Promise(async (resolve, reject) => {
             let cart = await cartDB.findOne({ userId: userId })
-            console.log(cart);
+            // console.log(cart);
             let total = 0;
             if (cart) {
 
@@ -200,7 +200,7 @@ module.exports={
                 }
                 cart.totalAmount = total;
                 await cart.save()
-                console.log(total);
+                // console.log(total);
                 resolve(total)
 
                 // console.log("cartItemscartItemscartItems");
@@ -224,7 +224,7 @@ module.exports={
     },
     decreaseStock:(cartItems)=>{
         return new Promise(async (resolve,reject)=>{
-            console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{");
+            // console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{");
             // console.log("decreaseStock0",cartItems);
             for(let i=0;i<cartItems.length;i++){
                 let product = await products.findById({_id:cartItems[i].item});
@@ -239,17 +239,17 @@ module.exports={
                 await product.save();
                 // console.log("decreaseStock2",product);
             }
-            console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{");
+            // console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{");
             resolve(true)
         })
     },
     totalamount: (userId) => {
         return new Promise(async (resolve, reject) => {
           const cart = await cartDB.findOne({ userId: userId });
-          console.log(cart);
+        //   console.log(cart);
           if (cart !== null) {
             resolve(cart.totalAmount);
-            console.log("cart found ++++++++++++++++++++++++++++");
+            // console.log("cart found ++++++++++++++++++++++++++++");
           } else {
             // Handle the case when cart is null
             reject(new Error("Cart not found for the user"));

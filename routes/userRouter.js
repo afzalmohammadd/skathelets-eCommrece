@@ -85,10 +85,6 @@ router.get('/order-success',userCheck,BlockOr,userController.orderSuccess)
 
 router.get('/orders',userCheck,BlockOr,userController.orders)
 
-
-router.get('/Cancel-Order/:id',userCheck,BlockOr,userController.orderCancelling)
-
-
 router.get('/order-details/:id',userCheck,BlockOr,userController.productOrderDetails)
 
 
@@ -96,6 +92,12 @@ router.post('/verify-payment',userController.verifypayment)
 
 router.post('/filterCategory',userController.filterByCategory)
 
+// coupon
+router.post('/apply-coupon',userController.applyCoupon)
+
+router.post('/cancel-order',userController.cancelOrder)
+
+router.post('/return-order',userController.returnOrder)
 
 
 module.exports = router;

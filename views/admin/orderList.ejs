@@ -47,7 +47,7 @@
                                     <th scope="col">PAYMENT TYPE</th>
                                     <th scope="col">STATUS</th>
                                     <th scope="col">CHANGE STATUS</th>
-                                    <!-- <th scope="col">VIEW DETAILS</th> -->
+                                    <th scope="col">VIEW DETAILS</th>
                                     <!-- <th scope="col">CANCEL</th> -->
                                     <!-- <th scope="col" class="text-end"> Action </th> -->
                                 </tr>
@@ -97,6 +97,11 @@
                                         <% } %>
                                             
       
+                                        </td>
+
+                                        <td>
+                                            <a href="/admin/order-detailsAdmin/<%= orders[i]._id %>" class="btn btn-primary btn-xs">View Details</a>
+                                            
                                         </td>
                                 </tr>
                                 <% } %>

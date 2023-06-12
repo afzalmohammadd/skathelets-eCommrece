@@ -17,9 +17,9 @@ module.exports={
                 pincode:addressData.pincode,
                 userId:addressData.id
             })
-            console.log("+++++++++++++");
-            console.log(address)
-            console.log("++++++++")
+            // console.log("+++++++++++++");
+            // console.log(address)
+            // console.log("++++++++")
             await address.save();
             resolve(address)
         })
@@ -37,7 +37,7 @@ module.exports={
         return new Promise(async(resolve,reject)=>{
             await addressSchema.findById(addressId)
             .then((result)=>{
-                console.log("inside helper");
+                // console.log("inside helper");
                 resolve(result)
             })
         })
@@ -45,9 +45,9 @@ module.exports={
     editAnAddress : async (editedAddress) => {
         return new Promise(async (resolve, reject) => {
           try {
-            console.log("edit add", editedAddress);
+            // console.log("edit add", editedAddress);
             let address = await addressSchema.findById(editedAddress.addressId);
-            console.log("edit address", address);
+            // console.log("edit address", address);
       
             address.first_name = editedAddress.fname;
             address.last_name = editedAddress.lname;

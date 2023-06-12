@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <!-- Add the Bootstrap CSS file -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container-fluid {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .content-title {
+            font-size: 36px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #f8f8f8;
+            border-bottom: none;
+            padding: 30px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .card-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 0;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .order-info .info-item {
+            flex: 1;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .info-item h6 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .info-item p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .order-info .info-item .badge {
+            font-size: 18px;
+            padding: 8px 14px;
+            background-color: #4caf50;
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        .order-details-table {
+            margin-bottom: 40px;
+        }
+
+        .order-details-table th {
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+            background-color: #f5f5f5;
+            border-top: none;
+        }
+
+        .order-details-table td {
+            font-size: 18px;
+            color: #333;
+            border-top: none;
+        }
+
+        .order-details-table .product-img {
+            width: 60px;
+            height: 60px;
+            margin-right: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #f5f5f5;
+        }
+
+        .order-details-table .product-title {
+            font-weight: 600;
+        }
+
+        .order-details-table .text-end {
+            text-align: right;
+        }
+
+        .subtotal-row {
+            font-weight: 600;
+        }
+
+        .cancel-return-buttons {
+            margin-top: 40px;
+        }
+
+        .cancel-return-buttons button {
+            margin-right: 20px;
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            background-color: #ff6600;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cancel-return-buttons button:hover {
+            background-color: #ff4d00;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="card-title text-center">Order Details</h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <h5>Order Information</h5>
+                                    <p><strong>Date:</strong>
+                                        <%=orderdetails.orderDate%>
+                                    </p>
+                                    <p><strong>Order ID:</strong>
+                                        <%= orderdetails._id %>
+                                    </p>
+                                </div>
+                                <div class="mb-4">
+                                    <h5>Shipping Information</h5>
+                                    <p><strong>Shipping:</strong> Fargo Express</p>
+                                    <p><strong>Payment Method:</strong>
+                                        <%=orderdetails.paymentMethod%>
+                                    </p>
+                                    <p><strong>Status:</strong>
+                                        <%=orderdetails.orderStatus%>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <h5>Customer Details</h5>
+                                    <p><strong>Email:</strong>
+                                        <%= orderdetails.address?.email_id %>
+                                    </p>
+                                    <p><strong>Phone:</strong>
+                                        <%= orderdetails.address?.mobile %>
+                                    </p>
+                                    <a href="#" class="btn btn-dark">View Profile</a>
+                                </div>
+                                <div class="mb-4">
+                                    <h5>Delivery Address</h5>
+                                    <p><strong>
+                                            <%= orderdetails.address?.state %>
+                                        </strong> ,<%= orderdetails.address?.city %>
+                                    </p>
+                                    <p><strong>
+                                            <%= orderdetails.address?.address %>
+                                        </strong>
+                                        <%= orderdetails.address?.pincode %>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Order Items</h5>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th width="40%">Product</th>
+                                            <th width="20%">Unit Price</th>
+                                            <th width="20%">Quantity</th>
+                                            <th width="20%" class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% for( let i=0; i < productDetails.length; i++ ) { %>
+                                            <tr>
+                                                <td>
+                                                    <a class="itemside" href="#">
+                                                        <div class="left">
+                                                            <img src="/uploads/<%= productDetails[i].orderedProduct.prodImage[0] %>"
+                                                                width="40" height="40" class="img-xs" alt="Item">
+                                                        </div>
+                                                        <!-- <div class="dark"></div> -->
+                                                        <p>
+                                                            <%=productDetails[i].orderedProduct.prodName%>
+                                                        </p>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <%=productDetails[i].orderedProduct.prodPrice%>
+                                                </td>
+                                                <td>
+                                                    <%=productDetails[i].orderedItems.quantity%>
+                                                </td>
+                                                <td class="text-end">
+                                                    <%=productDetails[i].orderedProduct.prodPrice*productDetails[i].orderedItems.quantity%>
+                                                </td>
+
+                                            </tr>
+                                            <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 offset-md-6">
+                                <div class="mb-4">
+                                    <dl class="row">
+                                        <dt class="col-sm-6">Subtotal:</dt>
+                                        <dd class="col-sm-6">
+                                            <%= orderdetails.totalAmount %>
+                                        </dd>
+                                    </dl>
+                                    <dl class="row">
+                                        <dt class="col-sm-6">Shipping Cost:</dt>
+                                        <dd class="col-sm-6">60</dd>
+                                    </dl>
+                                    <dl class="row">
+                                        <dt class="col-sm-6">Grand Total:</dt>
+                                        <dd class="col-sm-6"><strong>
+                                                <%= orderdetails.totalAmount +60 %>
+                                            </strong></dd>
+                                    </dl>
+                                    <dl class="row">
+                                        <dt class="col-sm-6">Status:</dt>
+                                        <dd class="col-sm-6"><span
+                                                class="badge rounded-pill alert-success text-success">
+                                                <%=orderdetails.orderStatus%>
+                                            </span></dd>
+                                    </dl>
+                                    <div class="text-end">
+
+                                        <% if (orderdetails.orderStatus !=='delivered' && orderdetails.orderStatus
+                                            !=='canceled' && orderdetails.orderStatus !=='return pending' &&
+                                            orderdetails.orderStatus !=='returned' ) { %>
+                                            <button class="btn btn-danger mr-2"
+                                                onclick="cancelOrder('<%= orderdetails.user %>','<%= orderdetails._id %>')">Cancel
+                                                Order</button>
+                                            <% } %>
+
+                                                <% if (orderdetails.orderStatus=='delivered' ) { %>
+                                                    <button class="btn btn-secondary"
+                                                        onclick="returnOrder('<%= orderdetails.user %>','<%= orderdetails._id %>')">Return
+                                                        Order</button>
+                                                    <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add the Bootstrap JavaScript file (optional) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</body>
+
+</html>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+
+
+
+<script>
+    function cancelOrder(userId, orderId) {
+        console.log("clicked", userId);
+
+        swal("Do you want to Cancel This Order", {
+            buttons: ['No', 'Yes']
+        })
+            .then((res) => {
+                if (res) {
+                    $.ajax({
+                        url: '/cancel-order',
+                        method: 'post',
+                        data: {
+                            userId: userId,
+                            orderId: orderId
+                        }
+                    })
+                        .done((res) => {
+                            console.log(res);
+                            Toastify({
+                                text: `${res.message}`,
+                                duration: 3000,
+                                newWindow: true,
+                                close: true,
+                                gravity: "top", // `top` or `bottom`
+                                position: "center", // `left`, `center` or `right`
+                                stopOnFocus: true, // Prevents dismissing of toast on hover
+                                style: {
+                                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                                },
+                            }).showToast();
+
+                            // Redirect to the order details page without reloading
+                            window.location.replace('/order-details/' + orderId);
+                        });
+                }
+            });
+    }
+
+    function returnOrder(userId, orderId) {
+        console.log("clicked", userId);
+
+        swal("Do you want to Return This Order", {
+            buttons: ['No', 'Yes']
+        })
+            .then((res) => {
+                if (res) {
+                    $.ajax({
+                        url: '/return-order',
+                        method: 'post',
+                        data: {
+                            userId: userId,
+                            orderId: orderId
+                        }
+                    })
+                        .done((res) => {
+                            console.log(res);
+                            Toastify({
+                                text: `${res.message}`,
+                                duration: 3000,
+                                newWindow: true,
+                                close: true,
+                                gravity: "top", // `top` or `bottom`
+                                position: "center", // `left`, `center` or `right`
+                                stopOnFocus: true, // Prevents dismissing of toast on hover
+                                style: {
+                                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                                },
+                            }).showToast();
+
+                            // Reload the page to reflect the updated order status
+                            location.reload();
+                        })
+                        .then(() => {
+                            // Redirect to the order details page without reloading
+                            window.location.replace('/order-details/' + orderId);
+                        });
+                }
+            });
+    }
+
+
+
+</script>

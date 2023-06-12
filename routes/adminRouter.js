@@ -65,6 +65,18 @@ router.get('/orders',adminChecking,adminController.listOrder)//Listing order
 
 router.post('/order-status',adminChecking,adminController.changeProductOrderStatus)
 
+router.get('/order-detailsAdmin/:id',admincontroller.productOrderDetailsAdmin)
+
+router.post('/cancel-order',adminChecking,admincontroller.orderCancel)
+
+router.post('/return-order',adminChecking,admincontroller.orderReturn)
+
+//OFFERS
+
+router.get('/coupon',adminChecking,adminController.coupons)
+
+router.post('/add-coupon',adminChecking,adminController.postAddCoupon)
+
 
 
 module.exports = router;

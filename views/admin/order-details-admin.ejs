@@ -215,6 +215,18 @@
                                                                 class="badge rounded-pill alert-success text-success"><%= orderdetails.orderStatus %></span>
                                                         </dd>
                                                     </dl>
+
+                                                    <% if (orderdetails.returnReason) { %>
+                                                        <dl class="dlist" style="color: red;">
+                                                            <dt>Return reason:</dt>
+                                                            <dd><%= orderdetails.returnReason %></dd>
+                                                        </dl>
+                                                    <% } %>
+                                                    
+                                                    
+
+                                                    
+
                                                     <% if (orderdetails.orderStatus !== 'delivered' && orderdetails.orderStatus !== 'canceled' && orderdetails.orderStatus !== 'return pending' && orderdetails.orderStatus !== 'returned') { %>
                                                         <button class="float-left ml-5" style="background-color: rgb(205, 120, 120);" onclick="cancelOrder('<%= orderdetails.user %>','<%= orderdetails._id %>')">Cancel order</button>
                                                       <% } %>

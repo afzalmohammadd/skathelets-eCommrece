@@ -11,6 +11,7 @@ const cartDB = require('../models/cartModel')
 const orderDB = require('../models/orderModel')
 const addressDB = require('../models/addressModel')
 const addressHelper = require('../helpers/addressHelper')
+const walletHelper = require('../helpers/walletHelper')
 const orderhelper = require('../helpers/orderhelper')
 const ObjectId = require('mongoose').Types.ObjectId
 
@@ -454,12 +455,14 @@ module.exports = {
     checkout: async (req, res) => {
         try {
             const user = req.session.user;
+            let userId = req.session.user._id
 
             let cartItems = await userhelper.getAllCartItems(user._id);
 
             let totalAmount = await userhelper.totalSubtotal(user._id, cartItems);
             totalAmount = totalAmount.toLocaleString('en-in', { style: 'currency', currency: 'INR' })
             const userAddress = await addressHelper.findAddresses(user._id)
+            let couponDetails = await coupenHelper.getCoupoforListing(userId)
             // console.log("[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]")
             // console.log(userAddress)
             // console.log("[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]")
@@ -478,7 +481,7 @@ module.exports = {
             // console.log(loginStatus);
             // console.log("AAAAAAAAAAAAAAAAAAAAAA");
 
-            res.render('shop/checkout', { layout: "layouts/userLayout", loginUser, cartCount, user, totalAmount: totalAmount, cartItems, address: userAddress, Status })
+            res.render('shop/checkout', { layout: "layouts/userLayout", loginUser, cartCount, user, totalAmount: totalAmount, cartItems, address: userAddress, coupon:couponDetails, Status })
         } catch (error) {
             console.log(error);
         }
@@ -542,8 +545,10 @@ module.exports = {
                 return res.json({ error: true, message: "Please Choose Payment Method" });
             }
 
-            let totalAmount = await userhelper.totalamount(userId);
+            let totalAmount = await userhelper.totalamount(userId)
+            console.log("inside placeOrder");
 
+            console.log(req.body);
 
             if (req.body.payment === 'COD') {
                 await orderhelper.orderPlacing(req.body, totalAmount, cartItems);
@@ -552,6 +557,7 @@ module.exports = {
                 const cartCount = await userhelper.getCartCount(userId);
                 res.status(202).json({ message: "Purchase Done", payment: req.body.payment });
             } else if (req.body.payment === 'onlinePayment') {
+                console.log("online payment checking condition ")
                 const orderId = await orderhelper.orderGetting(req.body, totalAmount, cartItems);
                 await userhelper.decreaseStock(cartItems);
                 await userhelper.clearCart(userId);
@@ -560,11 +566,27 @@ module.exports = {
                 try {
                     const response = await orderhelper.generateRazorpay(orderId, totalAmount);
                     // console.log("sally");
-                    // console.log(response, "555555555555555555555555555555555555555555555555555555555555555555555555555555555");
+                    console.log(response, "555555555555555555555555555555555555555555555555555555555555555555555555555555555");
                     res.status(200).json({ response, payment: req.body.payment });
                 } catch (error) {
                     console.log(error);
                     res.status(500).json({ status: false, error: 'An error occurred' });
+                }
+            } else if (req.body.payment === 'wallet') {
+                console.log("wwwwwwwwwwwwwwwwwwwwwwwllt");
+                let isPaymentDone = await walletHelper.payUsingWallet(userId, totalAmount);
+                console.log("after - isPaymnetDone",isPaymentDone);
+                if (isPaymentDone) {
+                    console.log(isPaymentDone);
+                    await orderhelper.orderPlacing(req.body, totalAmount, cartItems)
+                        .then(async (orderDetails) => {                     
+                            await userhelper.decreaseStock(cartItems);
+                            await userhelper.clearCart(userId)
+                            console.log("inside placeOrder - checking wallet condition");
+                            res.status(202).json({ response, payment: req.body.payment , error: false, message: "Purchase Done" })
+                        })
+                } else {
+                    res.status(200).json({ paymentMethod: 'wallet', error: true, message: "Insufficient Balance in wallet" })
                 }
             }
         } catch (error) {
@@ -611,13 +633,15 @@ module.exports = {
 
             let productDetails = await orderhelper.getOrderedProductsDetails(orderId); //got ordered products details
 
-            console.log("inside productOrderDetails");
+            let couponDetails = await coupenHelper.getOrderedCouponDetails(orderId)
+            
+            console.log("inside productOrderDetails")
             
             
             res.render('shop/order-details-user', {
                 layout: "layouts/userLayout",
                 user:true,
-                orderdetails, productDetails, loginStatus, Status
+                couponDetails,orderdetails, productDetails, loginStatus, Status
             })
         } catch (error) {
 
@@ -719,11 +743,17 @@ module.exports = {
 
     cancelOrder:async(req,res) =>{
 
+        console.log("inside cancelorder");
+
         const userId = req.body.userId;
-        const orderId = req.body.orderId;
+        const orderId = req.body.orderId
+        console.log(userId,"userId")
+        console.log(orderId,"orderId");
+
 
         try{
-            const cancelled = await orderhelper.cancelorder(orderId)
+            const cancelled = await orderhelper.cancelorder(userId,orderId)
+            console.log(cancelled);
             res.status(200).json({ isCancelled: true, message: "order canceled successfully" })
         }catch(error){
             console.log(error);
@@ -731,14 +761,45 @@ module.exports = {
     },
 
     returnOrder:async(req,res) =>{
+
+        console.log("inside return order")
+
         const userId = req.body.userId
         const orderId = req.body.orderId
+        const  returnReason = req.body.returnReason
+
+        console.log(returnReason,"this is the return reason");
 
         try{
-            const returnOrder = await orderhelper.orderReturn(userId,orderId)
+            const returnOrder = await orderhelper.orderReturn(userId,orderId,returnReason)
             res.status(200).json({isreturned: 'return pending', message:"user is returning the order"})
         }catch(error){
             console.log(error);
+        }
+    },
+
+    getWallet: async(req,res) =>{
+        try{
+            let userId = req.session.user._id
+            console.log(userId);
+            let walletBalance =await walletHelper.walletBalance(userId)
+            console.log("hiiiiiiiiiiiiiiii",walletBalance);
+            res.json({walletBalance})
+        }catch(error){
+            console.log(error);
+        }
+    },
+
+    getCouponDetails:async(req,res) =>{
+        try{
+            let userId = req.session.user._id
+            console.log(userId,"for coupondetails Getting")
+            let couponDetails = await coupenHelper.getCoupoforListing(userId)
+            console.log(couponDetails,"available coupons for this user");
+            console.log(couponDetails,"getting coupons details showing user in checkout coupons modal")
+            res.json({couponDetails})
+        }catch(error){
+
         }
     }
     

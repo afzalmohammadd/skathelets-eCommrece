@@ -160,6 +160,8 @@
                                     <a href="/getShoppingCart" class="dropdown-item">Shopping Cart</a>
                                     <a href="checkout.html" class="dropdown-item">Checkout</a>
                                     <a href="/orders" class="dropdown-item">My Orders</a>
+                                    <a href="" class="dropdown-item" id="wallet-details" data-toggle="modal"
+                                    data-target="#walletModal" >WALLET</a>
                                 </div>
                             </div>
                             <a href="contact.html" class="nav-item nav-link">Contact</a>
@@ -170,7 +172,56 @@
 
                         </div>
                     </div>
+
+                    <!-- wallet Modal start -->
+
+                <div class="modal fade" id="walletModal" tabindex="-1" role="dialog"
+                    aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+
+                            <div class=" text-center mt-5 mb-5">
+                                <h2 style="text-decoration: underline; ;" class="modal-title"
+                                    id="exampleModalLabel">Wallet</h2>
+                                <span style="font-size: 17px;" class="modal-title" id="walletAmount">Your
+                                    Wallet Balance is: </span>
+                            </div>
+                            
+                            <div>
+                                <button type="button" class=" btn btn-secondary d-block ml-auto mr-3 mb-3"
+                                    data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+
+                <!-- wallet Modal end -->
+
+
                 </nav>
             </div>
         </div>
     </div>
+
+    <script>
+
+        $('#wallet-details').on('click', function (e) {
+                    e.preventDefault()
+                    // let userId=$('#wallet-details').data('wallet')
+                    // console.log("userId",userId);
+                    $.ajax({
+                        url: "/wallet",
+                        method: 'get',
+                        // data:userId
+
+                    })
+                        .then((res) => {
+                            console.log(res);
+                            document.getElementById('walletAmount').innerHTML = "Your wallet balance is : " + res.walletBalance
+
+                            $("#walletModal").modal("show");
+
+                        })
+                })
+                
+    </script>

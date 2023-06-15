@@ -36,13 +36,21 @@ module.exports = {
   adminHome: async (req, res) => {
     try {
       const revenue = await orders.aggregate([{ $match: { orderStatus: "delivered" } }, { $group: { _id: "null", total: { $sum: "$totalAmount" } } }]);
+      if(revenue.length<0){
+        throw new error('no order delivered')
+      }
       const ordercountAggregation = await orders.aggregate([{ $match: { orderStatus: "delivered" } }, { $count: "ordercount" }])
+      console.log('2',ordercountAggregation);
       const ordercount = ordercountAggregation[0]?.ordercount || 0
+      console.log('3',ordercount);
       const productsCount = await products.find({}).count()
+      console.log('4',productsCount);
       const categoriesCount = await categories.find({}).count()
+      console.log('5',categoriesCount);
       const userCount = await user.find({}).count()
+      console.log('6',userCount)
       // let orders = await orderhelper.getAllOrders()
-      console.log(orders);
+      
       res.render("admin/admin-home", {
         layout: "layouts/adminLayout",
         admin: false,

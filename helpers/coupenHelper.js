@@ -3,26 +3,26 @@ const OrderDB = require('../models/orderModel')
 const CategoryDB = require('../models/categoryModel')
 const CartDB = require('../models/cartModel')
 
-const voucherCode=require('voucher-code-generator')
+const voucherCode = require('voucher-code-generator')
 
-module.exports={
-    
+module.exports = {
+
 
     addCouponToDB: (couponData) => {
         return new Promise(async (resolve, reject) => {
-            
+
             const dateString = couponData.couponExpiry;
             const [day, month, year] = dateString.split(/[-/]/);
             const date = new Date(`${year}-${month}-${day}`);
             const convertedDate = date.toISOString();
 
-            let couponCode=voucherCode.generate({
+            let couponCode = voucherCode.generate({
                 length: 6,
                 count: 3,
                 charset: voucherCode.charset("alphabetic")
             });
 
-            console.log("voucher code generator",couponCode[0])
+            console.log("voucher code generator", couponCode[0])
             // console.log(convertedDate)
 
             const coupon = await new couponDB({
@@ -41,7 +41,7 @@ module.exports={
                     reject(error)
                 })
         })
-      },
+    },
 
     getAllCoupons: () => {
         return new Promise(async (resolve, reject) => {
@@ -52,33 +52,73 @@ module.exports={
         })
     },
 
-    applyCoupon:(userId, couponCode) => {
-        return new Promise(async(resolve,reject) => {
-            let coupon = await couponDB.findOne({code :couponCode})
-            console.log("couppppppppponnnnn",coupon)
+    applyCoupon: (userId, couponCode) => {
+        return new Promise(async (resolve, reject) => {
+            let coupon = await couponDB.findOne({ code: couponCode })
+            console.log("couppppppppponnnnn", coupon)
 
-            if(coupon && coupon.isActive == 'Active') {
-                if(!coupon.usedBy.includes(userId)) {
+            if (coupon && coupon.isActive == 'Active') {
+                if (!coupon.usedBy.includes(userId)) {
 
-                    let cart = await CartDB.findOne({userId:userId})
+                    let cart = await CartDB.findOne({ userId: userId })
                     const discount = coupon.discount
-                    console.log("cart",cart)
+                    console.log("cart", cart)
 
-                    cart.totalAmount=cart.totalAmount-discount
-                    cart.coupon=couponCode
+                    cart.totalAmount = cart.totalAmount - discount
+                    cart.coupon = couponCode
 
                     await cart.save()
+
 
                     coupon.usedBy.push(userId)
                     await coupon.save()
 
-                    resolve({discount,cart,status:true,message:"coupon added succesfully"})
-                }else{
-                    resolve({status:false,message:"coupon code already used"})
+                    resolve({ discount, cart, status: true, message: "coupon added succesfully" })
+                } else {
+                    resolve({ status: false, message: "coupon code already used" })
                 }
-            }else{
-                resolve({status:false,message:"invalid Coupon code"})
+            } else {
+                resolve({ status: false, message: "invalid Coupon code" })
             }
         })
+    },
+
+    getOrderedCouponDetails: (orderId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const order = await OrderDB.findById(orderId);
+
+                if (order) {
+                    const couponCode = order.coupon;
+
+                    if (couponCode) {
+                        const coupon = await couponDB.findOne({ code: couponCode });
+                        resolve(coupon);
+                    } else {
+                        console.log("Coupon code not found in the order.");
+                        resolve(0);
+                    }
+                } else {
+
+                    resolve("0")
+                    console.log("coupon not found");
+                }
+            } catch (error) {
+                reject(error);
+            }
+        });
+    },
+    getCoupoforListing: (userID) => {
+        return new Promise(async (resolve, reject) => {
+            await couponDB.find({ usedBy: { $nin: [userID] } })
+                .then(coupons => {
+                    resolve(coupons)
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        })
     }
+
+
 }

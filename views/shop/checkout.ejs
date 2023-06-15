@@ -167,15 +167,24 @@
                 </div>
 
             </div>
+
             <div class="col-lg-4">
                 <div class="input-group">
-                    <input type="text" name="couponCode" id="couponCode" class="form-control p-4" placeholder="Coupon Code">
+                    <button class="dropdown-item" id="coupon-details" data-toggle="modal" data-target="#couponModal"
+                        style="background-color: goldenrod; color: white; border: none; padding: 8px 16px; font-size: 16px; border-radius: 4px; text-decoration: none; cursor: pointer;">
+                        Available Coupons
+                    </button>
+                    <input type="text" name="couponCode" id="couponCode" class="form-control p-4"
+                        placeholder="Coupon Code">
                     <div class="input-group-append">
-                        <button class="btn btn-primary" onclick="applyCoupon('<%= totalAmount %>')" >Apply Coupon</button>
+                        <button class="btn btn-primary" onclick="applyCoupon('<%= totalAmount %>')">Apply
+                            Coupon</button>
                     </div>
                 </div>
+
+
                 <span id="couponApplySuccess" class="text-success"></span>
-				<span id="couponApplyFail" class="text-danger"></span>
+                <span id="couponApplyFail" class="text-danger"></span>
                 <div class="card border-secondary mb-5">
 
                     <div class="card-header bg-secondary border-0">
@@ -210,21 +219,21 @@
 
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Subtotal</h5>
-                            <h5   class="font-weight-bold">
+                            <h5 class="font-weight-bold">
                                 <%= totalAmount %>
                             </h5>
                         </div>
 
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Discount</h5>
-                            <h5 id="discount"  class="font-weight-bold">
+                            <h5 id="discount" class="font-weight-bold">
                                 0.00
                             </h5>
                         </div>
 
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold" id="totalAmount"  >
+                            <h5 class="font-weight-bold" id="totalAmount">
                                 <%= totalAmount %>
                             </h5>
                         </div>
@@ -236,6 +245,13 @@
                         <h4 class="font-weight-semi-bold m-0">Payment</h4>
                     </div>
                     <div class="card-body">
+                        <div class="form-group">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" name="payment" id="wallet"
+                                    value="wallet">
+                                <label class="custom-control-label" for="wallet">Wallet</label>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <div class="custom-control custom-radio">
                                 <input type="radio" class="custom-control-input" name="payment" id="COD" value="COD">
@@ -255,11 +271,44 @@
                             Order</button>
                     </div>
                 </div>
+
             </div>
 
         </div>
     </form>
 </div>
+<!--Coupon Details modal-->
+
+<div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLabel">Coupon Details</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <tbody>
+                        <% for (var i = 0; i < coupon.length; i++) { %>
+                        <tr>
+                            <td><strong>Coupon Name:</strong> <span id="couponName"><%= coupon[i].couponName %></span></td>
+                            <td><strong>Discount Amount:</strong> <span id="couponAmount"><%= coupon[i].discount %></span></td>
+                            <td><strong>Code:</strong> <span id="couponCode"></span><%= coupon[i].code %></td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- add address modal -->
 <div class="modal fade" id="newAddress" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -397,15 +446,14 @@
 <!-- Checkout End -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="path/to/toastify.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 <script>
     $(document).ready(function () {
         $('#checkout-form').submit((e) => {
             e.preventDefault();
-            // let data=JSON.stringify($('#checkout-form').serialize())
-            // console.log($('#checkout-form').serialize().payment);
-            // console.log(data.payment);
-            // console.log($('#checkout-form').serialize().addressSelected);
             console.log("hello");
             $.ajax({
                 url: '/place-order',
@@ -415,17 +463,16 @@
                 .done((response) => {
                     if (response.error) {
                         Toastify({
-                            text: `${res.message}`,
+                            text: `${response.message}`,
                             duration: 3000,
                             newWindow: true,
                             close: true,
-                            gravity: "top", // `top` or `bottom`
-                            position: "center", // `left`, `center` or `right`
-                            stopOnFocus: true, // Prevents dismissing of toast on hover
+                            gravity: "top",
+                            position: "center",
+                            stopOnFocus: true,
                             style: {
                                 background: "linear-gradient(to right, #00b09b, #96c93d)",
                             },
-
                         }).showToast();
                     } else if (response.payment === 'COD') {
                         console.log("payment done");
@@ -433,15 +480,17 @@
                     } else if (response.payment === 'onlinePayment') {
                         console.log(response);
                         razorpayPayment(response.response);
+                    } else if (response.payment === 'wallet') {
+                        console.log("wallet payment success");
+                        location.href = "/order-success";
                     }
+                })
+                .fail((error) => {
+                    console.error("Error:", error);
+                });
+        });
+    });
 
-                })
-                .fail((err) => {
-                    console.log("Error occured");
-                    console.log(err);
-                })
-        })
-    })
 
     function razorpayPayment(order) {
         var options = {
@@ -453,8 +502,9 @@
             "image": "https://example.com/your_logo",
             "order_id": order.razorpay_order_id, // Use the Razorpay order ID
             "handler": function (response) {
-                
-                console.log(response, order);
+
+                console.log(response, order)
+                location.href = "/order-success"
                 verifyPayment(response, order);
             },
             "prefill": {
@@ -492,6 +542,10 @@
 </script>
 
 <script>
+
+
+
+
     $(document).ready(function () {
         $('#add-address-form').submit((e) => {
             e.preventDefault();
@@ -566,34 +620,34 @@
     })
 
     function applyCoupon(totalAmount) {
-		const couponCode = document.getElementById('couponCode').value;
-		console.log(couponCode)
+        const couponCode = document.getElementById('couponCode').value;
+        console.log(couponCode)
         console.log(totalAmount)
 
-		$.ajax({
-			url: '/apply-coupon',
-			type: 'post',
-			data: {
-				couponCode: couponCode,
-			}
-		})
-			.done((res) => {
-				if (res.status) {
-					console.log("hello");
-					console.log(res);
-					document.getElementById('couponApplyFail').classList.add('d-none')
-					document.getElementById('couponApplySuccess').classList.remove('d-none')
-					document.getElementById('couponApplySuccess').innerHTML = res.message
-					document.getElementById('discount').innerHTML = -res.discount
-					document.getElementById('totalAmount').innerHTML = res.cart.totalAmount
-				} else {
-					console.log(res);
-					document.getElementById('couponApplySuccess').classList.add('d-none')
-					document.getElementById('couponApplyFail').classList.remove('d-none')
-					document.getElementById('couponApplyFail').innerHTML = res.message
+        $.ajax({
+            url: '/apply-coupon',
+            type: 'post',
+            data: {
+                couponCode: couponCode,
+            }
+        })
+            .done((res) => {
+                if (res.status) {
+                    console.log("hello");
+                    console.log(res);
+                    document.getElementById('couponApplyFail').classList.add('d-none')
+                    document.getElementById('couponApplySuccess').classList.remove('d-none')
+                    document.getElementById('couponApplySuccess').innerHTML = res.message
+                    document.getElementById('discount').innerHTML = -res.discount
+                    document.getElementById('totalAmount').innerHTML = res.cart.totalAmount
+                } else {
+                    console.log(res);
+                    document.getElementById('couponApplySuccess').classList.add('d-none')
+                    document.getElementById('couponApplyFail').classList.remove('d-none')
+                    document.getElementById('couponApplyFail').innerHTML = res.message
 
 
-				}
-			})
-	}
+                }
+            })
+    }
 </script>

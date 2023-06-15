@@ -16,11 +16,25 @@ const orderSchema = mongoose.Schema(
                 quantity:Number
             }
         ],
+
+        orderedPrice:{
+            type:Array,
+            default:[]
+        },
         address:{
             type: mongoose.Schema.Types.ObjectId,
             ref:'addresses'
         },
         orderDate:Date,
+        coupon:{
+            type: String,
+            default: null
+        },
+
+        returnReason:{
+            type:String,
+        
+        },
         
         totalAmount: Number,
         // finalAmount:Number,

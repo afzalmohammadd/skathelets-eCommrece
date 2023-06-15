@@ -25,9 +25,9 @@
                                 <span id="nameError" class="text-danger"></span>
                             </div>
                             <div class="mb-4">
-                                <label class="form-label"> description</label>
-                                <textarea placeholder="Type here" class="form-control" rows="4" name="prodDescription" value="  "<%= product.prodDescription %>"  id="prodDescription"></textarea>
-                                 <span id="descError" class="text-danger"></span>
+                                <label class="form-label">Description</label>
+                                <textarea placeholder="Type here" class="form-control" rows="4" name="prodDescription" id="prodDescription"><%= product.prodDescription %></textarea>
+                                <span id="descError" class="text-danger"></span>
                             </div>
                             <div class="row">
                                 <div class="col-lg-4">
@@ -107,10 +107,14 @@
                         <h4>Media</h4>
                     </div>
                     <div class="card-body">
-                        <div class="input-upload">
-                            <img src="/<%=product.prodImage%>" alt="">
-                            <input class="form-control" type="file" name="prodImage" multiple>
+                        
+                        <div class="card-body">
+                            <div class="input-upload">
+                                <img src="/uploads/<%= product.prodImage[0] %>" style="width: 100px; height: 72px;" alt="image not provided">
+                                <input class="form-control" value="/uploads/<%= product.prodImage[0] %>" type="file" name="prodImage" id="prodImage" multiple>
+                            </div>
                         </div>
+                        
                     </div>
                 </div> 
 

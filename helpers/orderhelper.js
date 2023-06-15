@@ -1,5 +1,6 @@
 const addressSchema = require('../models/addressModel')
 const orderSchema = require('../models/orderModel');
+const walletHelper = require('../helpers/walletHelper')
 
 const ObjectId = require('mongoose').Types.ObjectId;
 const Razorpay = require('razorpay');
@@ -23,11 +24,21 @@ module.exports = {
             let status = order.payment == 'COD' ? 'confirmed' : 'pending';
             let date = orderDate();
             let userId = order.userId;
+            let couponcode = order.couponCode
             // let address= await addressSchema.findById({_id:order.addressSelected})
             let paymentMethod = order.payment;
             let addressId = order.addressSelected;
             let orderedItems = cartItems
             // console.log("orderedItems", orderedItems)
+
+            let orderedPrices = []
+
+            for (let i = 0; i < orderedItems.length; i++) {
+                 orderedPrices.push(orderedItems[i].product.prodPrice) 
+
+                console.log(orderedPrices,"+++++++++++++++++++++++");
+                
+            }
 
             // console.log("orderedItems orderHelper ", orderedItems)
             let ordered = new orderSchema({
@@ -35,9 +46,12 @@ module.exports = {
                 address: addressId,
                 orderDate: date,
                 totalAmount: totalAmount,
+                coupon : couponcode,
                 paymentMethod: paymentMethod,
                 orderStatus: status,
-                orderedItems: orderedItems
+                orderedItems: orderedItems,
+                orderedPrice: orderedPrices,
+                returnReason:""
             })
             await ordered.save();
             // console.log("upoladed to dbbbbbbbbbbbbbbb")
@@ -92,6 +106,9 @@ module.exports = {
                         orderStatus:1,
                         totalAmount: 1,
                         paymentMethod: 1,
+                        orderedPrice:1,
+                        returnReason:1,
+
                         address: {
                             $arrayElemAt: ['$userAddress', 0]
                         }
@@ -267,33 +284,42 @@ module.exports = {
             }
         })
       },
-      cancelorder:(orderId)=>{
-        return new Promise(async(resolve,reject)=>{
+      cancelorder: (userId, orderId) => {
+        return new Promise(async (resolve, reject) => {
 
-            const cancelledResponse = await orderSchema.findByIdAndUpdate(
-                {_id: new ObjectId(orderId) },
-                {$set: {orderStatus:"canceled"}},
+            console.log(orderId);
+            const cancelledResponse = await orderSchema.findOneAndUpdate(
+                { _id: new ObjectId(orderId) },
+                { $set: { orderStatus: "cancelled" } },
                 {new:true}
             )
-    
-            console.log("cancelled Response",cancelledResponse)
+            console.log("cancelledResponse", cancelledResponse);
+            console.log("cancelledResponse.totalAmount", cancelledResponse.totalAmount);
+            
+            if(cancelledResponse.paymentMethod!='COD'){
+                await walletHelper.addMoneyToWallet(userId,cancelledResponse.totalAmount);
+            }
+            
+
 
             resolve(cancelledResponse.orderStatus)
-
         })
+    },
+      
 
-      },
-
-      orderReturn:(userId,orderId)=>{
+      orderReturn:(userId,orderId,returnReason)=>{
         return new Promise(async(resolve,reject)=>{
             const order = await orderSchema.findOne({_id: new ObjectId(orderId)})
             console.log("inside returnOrder",order)
 
             if(order.orderStatus=='delivered'){
                 order.orderStatus='return pending'
+                order.returnReason=returnReason
             }else if(order.orderStatus=='return pending'){
                 order.orderStatus='returned'
             }
+
+        
 
             await order.save()
             console.log("after the order returned",order)

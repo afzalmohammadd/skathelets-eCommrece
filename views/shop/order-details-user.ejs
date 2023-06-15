@@ -183,7 +183,10 @@
                                         <%=orderdetails.orderStatus%>
                                     </p>
                                 </div>
+
                             </div>
+
+
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     <h5>Customer Details</h5>
@@ -236,13 +239,13 @@
                                                     </a>
                                                 </td>
                                                 <td>
-                                                    <%=productDetails[i].orderedProduct.prodPrice%>
+                                                    <%=productDetails[i].orderedPrice[i]%>
                                                 </td>
                                                 <td>
                                                     <%=productDetails[i].orderedItems.quantity%>
                                                 </td>
                                                 <td class="text-end">
-                                                    <%=productDetails[i].orderedProduct.prodPrice*productDetails[i].orderedItems.quantity%>
+                                                    <%=productDetails[i].orderedPrice[i]*productDetails[i].orderedItems.quantity%>
                                                 </td>
 
                                             </tr>
@@ -254,6 +257,17 @@
                         <div class="row">
                             <div class="col-md-6 offset-md-6">
                                 <div class="mb-4">
+                                    <dl class="row">
+                                        <dt class="col-sm-6">Discount</dt>
+                                        <dd class="col-sm-6"> 
+                                            <% if (couponDetails.discount) { %>
+                                                <span style="color: green; font-weight: bold;">-<%= couponDetails.discount %></span>
+                                              <% } else { %>
+                                                0
+                                              <% } %>
+                                              
+                                        </dd>
+                                    </dl>
                                     <dl class="row">
                                         <dt class="col-sm-6">Subtotal:</dt>
                                         <dd class="col-sm-6">
@@ -279,13 +293,14 @@
                                     </dl>
                                     <div class="text-end">
 
-                                        <% if (orderdetails.orderStatus !=='delivered' && orderdetails.orderStatus
-                                            !=='canceled' && orderdetails.orderStatus !=='return pending' &&
-                                            orderdetails.orderStatus !=='returned' ) { %>
-                                            <button class="btn btn-danger mr-2"
-                                                onclick="cancelOrder('<%= orderdetails.user %>','<%= orderdetails._id %>')">Cancel
-                                                Order</button>
+                                        <% if (orderdetails.orderStatus !== 'delivered') { %>
+                                            <% if (orderdetails.orderStatus !== 'cancelled' && orderdetails.orderStatus !== 'return pending' && orderdetails.orderStatus !== 'returned') { %>
+                                                <button class="btn btn-danger mr-2"
+                                                    onclick="cancelOrder('<%= orderdetails.user %>','<%= orderdetails._id %>')">Cancel Order</button>
                                             <% } %>
+                                        <% } %>
+
+                                        
 
                                                 <% if (orderdetails.orderStatus=='delivered' ) { %>
                                                     <button class="btn btn-secondary"
@@ -357,17 +372,36 @@
     function returnOrder(userId, orderId) {
         console.log("clicked", userId);
 
-        swal("Do you want to Return This Order", {
-            buttons: ['No', 'Yes']
-        })
+
+        swal({
+        title: "Do you want to Return This Order",
+        content: {
+            element: "input",
+            attributes: {
+                placeholder: "Reason for returning",
+                type: "text",
+                id: "returnReason",
+                class: "return-input",
+                name: "returnReason"
+            },
+        },
+        buttons: ['No', 'Yes'],
+    })
+
+        
             .then((res) => {
                 if (res) {
+
+                    const returnReason = document.getElementById("returnReason").value
+
                     $.ajax({
                         url: '/return-order',
                         method: 'post',
                         data: {
                             userId: userId,
-                            orderId: orderId
+                            orderId: orderId,
+                            returnReason:returnReason
+                            
                         }
                     })
                         .done((res) => {
